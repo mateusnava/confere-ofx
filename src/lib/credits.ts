@@ -1,3 +1,7 @@
+import { and, eq, sql } from "drizzle-orm";
+import type { Db } from "@/lib/db/client";
+import { payments, sessions, users } from "@/lib/db/schema";
+
 export const CREDIT_PACKS = {
   pack_1: {
     credits: 1,
@@ -100,4 +104,107 @@ export function applyPaidPayment(
     account: { ...account, credits: account.credits + pack.credits },
     payment: { ...payment, status: "paid" },
   };
+}
+
+class CreditsRequiredError extends Error {
+  constructor() {
+    super("credits_required");
+    this.name = "CreditsRequiredError";
+  }
+}
+
+type SessionInsert = typeof sessions.$inferInsert;
+
+export async function persistConversion(
+  db: Db,
+  input: {
+    userId: string;
+    sessionValues: Omit<SessionInsert, "userId" | "creditSource">;
+  },
+): Promise<
+  | {
+      ok: true;
+      creditSource: CreditSource;
+      session: typeof sessions.$inferSelect;
+    }
+  | { ok: false; error: "credits_required" }
+> {
+  try {
+    return await db.transaction(async (tx) => {
+      const free = await tx
+        .update(users)
+        .set({ freeConversionUsed: true })
+        .where(
+          and(eq(users.id, input.userId), eq(users.freeConversionUsed, false)),
+        )
+        .returning({ id: users.id });
+
+      let creditSource: CreditSource;
+      if (free.length > 0) {
+        creditSource = "free";
+      } else {
+        const debit = await tx
+          .update(users)
+          .set({ credits: sql`${users.credits} - 1` })
+          .where(and(eq(users.id, input.userId), sql`${users.credits} >= 1`))
+          .returning({ id: users.id });
+        if (debit.length === 0) {
+          throw new CreditsRequiredError();
+        }
+        creditSource = "credit";
+      }
+
+      const [session] = await tx
+        .insert(sessions)
+        .values({
+          ...input.sessionValues,
+          userId: input.userId,
+          creditSource,
+        })
+        .returning();
+
+      return { ok: true, creditSource, session };
+    });
+  } catch (error) {
+    if (error instanceof CreditsRequiredError) {
+      return { ok: false, error: "credits_required" };
+    }
+    throw error;
+  }
+}
+
+export async function creditPaidPayment(db: Db, mercadoPagoId: string) {
+  await db.transaction(async (tx) => {
+    const [payment] = await tx
+      .select()
+      .from(payments)
+      .where(eq(payments.mercadoPagoId, mercadoPagoId))
+      .limit(1);
+
+    if (!payment || payment.status !== "pending" || !payment.userId) {
+      return;
+    }
+
+    const kind = parsePackKind(payment.kind);
+    if (!kind) {
+      return;
+    }
+
+    const flipped = await tx
+      .update(payments)
+      .set({ status: "paid", paidAt: new Date() })
+      .where(and(eq(payments.id, payment.id), eq(payments.status, "pending")))
+      .returning({ id: payments.id });
+
+    if (flipped.length === 0) {
+      return;
+    }
+
+    await tx
+      .update(users)
+      .set({
+        credits: sql`${users.credits} + ${CREDIT_PACKS[kind].credits}`,
+      })
+      .where(eq(users.id, payment.userId));
+  });
 }
