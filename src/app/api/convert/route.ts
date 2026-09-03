@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { checkBalance } from "@/lib/balance";
 import { convertExtracted } from "@/lib/convert";
+import { evaluateCredits, persistConversion } from "@/lib/credits";
 import { getDb } from "@/lib/db/client";
-import { sessions } from "@/lib/db/schema";
 import { classify, classifyImage } from "@/lib/pdf/classify";
 import {
   extractPdf,
@@ -10,8 +11,7 @@ import {
   isPdfMime,
   PasswordRequiredError,
 } from "@/lib/pdf/extract";
-import { auth } from "@/auth";
-import { evaluateQuota, getUserByEmail, recordUsage } from "@/lib/quota";
+import { getUserByEmail } from "@/lib/quota";
 import { deleteUploadedFile, readUploadedFile } from "@/lib/storage";
 
 export const runtime = "nodejs";
@@ -61,20 +61,28 @@ export async function POST(request: Request) {
       ? await getUserByEmail(authSession.user.email)
       : undefined;
 
-    const quota = await evaluateQuota(extracted?.pageCount ?? 1, {
-      ipAddress,
-      userId: user?.id,
-      userPlan: user?.plan,
-    });
+    const decision = evaluateCredits(
+      user
+        ? {
+            id: user.id,
+            credits: user.credits,
+            freeConversionUsed: user.freeConversionUsed,
+          }
+        : undefined,
+    );
 
-    if (!quota.allowed) {
+    if (!decision.allowed) {
+      if (decision.error === "unauthenticated") {
+        return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+      }
       return NextResponse.json(
-        {
-          error: "subscription_required",
-          reason: quota.reason,
-        },
+        { error: "credits_required" },
         { status: 402 },
       );
+    }
+
+    if (!user) {
+      return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
     }
 
     const result = await convertExtracted(extracted!, {
@@ -83,14 +91,12 @@ export async function POST(request: Request) {
       mimeType,
     });
 
-    const db = getDb();
     const expiresAt = new Date(Date.now() + 60_000);
     const balance = checkBalance(result.statement);
 
-    const [session] = await db
-      .insert(sessions)
-      .values({
-        userId: user?.id,
+    const persisted = await persistConversion(getDb(), {
+      userId: user.id,
+      sessionValues: {
         ipAddress,
         statement: result.statement,
         balance,
@@ -100,22 +106,20 @@ export async function POST(request: Request) {
         paid: true,
         paymentRequiredCents: 0,
         expiresAt,
-      })
-      .returning();
+      },
+    });
+
+    if (!persisted.ok) {
+      return NextResponse.json(
+        { error: "credits_required" },
+        { status: 402 },
+      );
+    }
 
     await deleteUploadedFile(body.blobUrl);
 
-    await recordUsage(
-      {
-        ipAddress,
-        userId: user?.id,
-        userPlan: user?.plan,
-      },
-      extracted?.pageCount ?? 1,
-    );
-
     return NextResponse.json({
-      sessionId: session.id,
+      sessionId: persisted.session.id,
       statement: result.statement,
       balance,
       expiresAt: expiresAt.toISOString(),
@@ -128,7 +132,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          error instanceof Error ? error.message : "Erro ao converter arquivo",
+          "Nao conseguimos ler este extrato. Nada foi cobrado. Tente outro arquivo.",
       },
       { status: 500 },
     );
