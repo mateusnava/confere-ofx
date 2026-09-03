@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-export function LoginForm() {
+export function LoginForm({ next }: { next?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -59,7 +59,7 @@ export function LoginForm() {
         throw new Error("Codigo invalido ou expirado");
       }
 
-      router.push("/perfil");
+      router.push(next && next.startsWith("/") ? next : "/perfil");
       router.refresh();
     } catch (confirmError) {
       setError(

@@ -1,19 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { desc, eq } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
+import { PixCheckout } from "@/components/PixCheckout";
+import { CREDIT_PACKS, formatCredits, parsePackKind } from "@/lib/credits";
+import { getDb } from "@/lib/db/client";
+import { payments } from "@/lib/db/schema";
 import { getUserByEmail } from "@/lib/quota";
-import { PLAN_PRICES } from "@/lib/plans";
 
 export const metadata: Metadata = {
   title: "Perfil | Confere OFX",
 };
-
-const PLAN_LABEL = {
-  free: "Gratis",
-  pro: PLAN_PRICES.pro.label,
-  escritorio: PLAN_PRICES.escritorio.label,
-} as const;
 
 export default async function PerfilPage() {
   const session = await auth();
@@ -22,6 +20,20 @@ export default async function PerfilPage() {
   }
 
   const user = await getUserByEmail(session.user.email);
+  const history = user
+    ? await getDb()
+        .select({
+          id: payments.id,
+          kind: payments.kind,
+          status: payments.status,
+          amountCents: payments.amountCents,
+          createdAt: payments.createdAt,
+        })
+        .from(payments)
+        .where(eq(payments.userId, user.id))
+        .orderBy(desc(payments.createdAt))
+        .limit(8)
+    : [];
 
   return (
     <main className="flex-1 bg-[#f4fbf9] px-6 py-16">
@@ -36,11 +48,43 @@ export default async function PerfilPage() {
         <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm text-[#6b8a84]">Email</p>
           <p className="mt-1 font-medium text-slate-900">{session.user.email}</p>
-          <p className="mt-5 text-sm text-[#6b8a84]">Plano</p>
+          <p className="mt-5 text-sm text-[#6b8a84]">Creditos</p>
           <p className="mt-1 font-medium text-[#0F6B5C]">
-            {PLAN_LABEL[user?.plan ?? "free"]}
+            {formatCredits(user?.credits ?? 0)}
           </p>
+          {user?.freeConversionUsed ? (
+            <p className="mt-3 text-sm text-[#3d5c56]">Conversao gratis ja usada</p>
+          ) : null}
         </section>
+
+        <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="font-semibold text-slate-900">Comprar creditos</h2>
+          <div className="mt-4">
+            <PixCheckout />
+          </div>
+        </section>
+
+        {history.length > 0 ? (
+          <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+            <h2 className="font-semibold text-slate-900">Pagamentos</h2>
+            <ul className="mt-4 space-y-2 text-sm text-[#3d5c56]">
+              {history.map((payment) => {
+                const kind = parsePackKind(payment.kind);
+                const price = kind ? CREDIT_PACKS[kind].price : null;
+                return (
+                  <li key={payment.id}>
+                    {payment.status}
+                    {price ? ` · ${price}` : null}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
+
+        <p className="mt-6 text-sm text-[#3d5c56]">
+          Se a pagina expirar, envie o PDF outra vez.
+        </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
           <Link

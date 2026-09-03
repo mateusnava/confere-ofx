@@ -8,11 +8,16 @@ export const metadata: Metadata = {
   description: "Entre ou crie sua conta com um codigo enviado no email.",
 };
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: PageProps<"/login">) {
   const session = await auth();
   if (session?.user?.email) {
     redirect("/perfil");
   }
+
+  const params = await searchParams;
+  const next = typeof params.next === "string" ? params.next : undefined;
 
   return (
     <main className="flex flex-1 justify-center bg-[#f4fbf9] px-6 py-16">
@@ -28,7 +33,7 @@ export default async function LoginPage() {
           acesso ja cria a conta.
         </p>
         <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
-          <LoginForm />
+          <LoginForm next={next} />
         </div>
       </div>
     </main>

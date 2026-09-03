@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PLAN_PRICES } from "@/lib/plans";
+import { CREDIT_PACKS } from "@/lib/credits";
 
 export const metadata: Metadata = {
   title: "Confere OFX | PDF vira OFX",
@@ -53,24 +53,28 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-5xl px-6 pb-20">
-        <h2 className="text-2xl font-bold tracking-tight">Planos</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Creditos</h2>
+        <p className="mt-2 text-sm text-[#3d5c56]">
+          1 conversao gratis na sua conta. Depois, compre so o que for usar.
+        </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <h3 className="font-semibold text-[#0F6B5C]">Gratis</h3>
-            <p className="mt-2 text-sm text-[#3d5c56]">1 consulta por IP/dia</p>
-          </div>
-          {(["pro", "escritorio"] as const).map((plan) => (
-            <div key={plan} className="rounded-2xl bg-white p-6 shadow-sm">
+          {(["pack_1", "pack_10", "pack_50"] as const).map((kind) => (
+            <div key={kind} className="rounded-2xl bg-white p-6 shadow-sm">
               <h3 className="font-semibold text-[#0F6B5C]">
-                {PLAN_PRICES[plan].label}
+                {CREDIT_PACKS[kind].label}
               </h3>
               <p className="mt-2 text-sm text-[#3d5c56]">
-                {PLAN_PRICES[plan].price} ·{" "}
-                {PLAN_PRICES[plan].pages.toLocaleString("pt-BR")} paginas/mes
+                {CREDIT_PACKS[kind].price}
               </p>
             </div>
           ))}
         </div>
+        <Link
+          href="/comprar"
+          className="mt-6 inline-block text-sm font-semibold text-[#0F6B5C]"
+        >
+          Comprar creditos
+        </Link>
       </section>
     </main>
   );
