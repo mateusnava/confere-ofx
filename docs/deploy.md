@@ -30,6 +30,6 @@ O cron em `vercel.json` executa `/api/cron/purge-blobs` a cada minuto.
 ## Smoke manual
 
 1. Enviar fixture Nubank nativo e baixar OFX com saldo fechado.
-2. Enviar segundo arquivo no mesmo IP e ver paywall de R$ 4,90.
-3. Enviar imagem/foto e ver paywall de R$ 9,90 antes do scan.
+2. Conta nova: primeiro arquivo vira preview; o segundo mostra o wall de creditos.
+3. Pix sandbox de R$ 4,90 → saldo 1 → converte → saldo 0. Header e perfil mostram o mesmo numero.
 4. Confirmar que blob some apos convert e sessao expira em 60s.

@@ -25,7 +25,7 @@ Credenciais: `confere` / `confere`, database `confere_ofx`.
 
 Em local, **nao precisa** de `BLOB_READ_WRITE_TOKEN`: o upload vai para memoria e expira em 60s. Na Vercel, configure o token para usar Vercel Blob.
 
-**Modelo:** 1 consulta gratis/IP/dia (sempre via LLM). Depois, plano mensal Pro ou Escritorio.
+**Modelo:** 1 conversao gratis na conta. Depois, creditos via Pix (1 · R$ 4,90 / 10 · R$ 39,90 / 50 · R$ 149).
 
 Landing: `/pdf-para-ofx`
 
