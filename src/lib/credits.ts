@@ -53,3 +53,51 @@ export function evaluateCredits(
 export function formatCredits(count: number): string {
   return count === 1 ? "1 credito" : `${count} creditos`;
 }
+
+export type CreditSource = "free" | "credit";
+
+export type ChargeResult =
+  | { ok: true; creditSource: CreditSource; account: CreditAccount }
+  | { ok: false; error: "credits_required" };
+
+export function chargeConversion(account: CreditAccount): ChargeResult {
+  if (!account.freeConversionUsed) {
+    return {
+      ok: true,
+      creditSource: "free",
+      account: { ...account, freeConversionUsed: true },
+    };
+  }
+  if (account.credits >= 1) {
+    return {
+      ok: true,
+      creditSource: "credit",
+      account: { ...account, credits: account.credits - 1 },
+    };
+  }
+  return { ok: false, error: "credits_required" };
+}
+
+export type PaymentRecord = {
+  id: string;
+  userId: string;
+  kind: PackKind;
+  amountCents: number;
+  status: "pending" | "paid" | "failed";
+  mercadoPagoId: string | null;
+};
+
+export function applyPaidPayment(
+  account: CreditAccount,
+  payment: PaymentRecord,
+  _claimedKind?: string,
+): { account: CreditAccount; payment: PaymentRecord } {
+  if (payment.status !== "pending") {
+    return { account, payment };
+  }
+  const pack = CREDIT_PACKS[payment.kind];
+  return {
+    account: { ...account, credits: account.credits + pack.credits },
+    payment: { ...payment, status: "paid" },
+  };
+}
