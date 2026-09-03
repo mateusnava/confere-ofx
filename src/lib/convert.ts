@@ -10,6 +10,15 @@ export type ConvertResult = {
   balance: BalanceCheck;
 };
 
+const UNCHARGED_READ_ERROR =
+  "Nao conseguimos ler este extrato. Nada foi cobrado. Tente outro arquivo.";
+const CHARGED_READ_ERROR =
+  "Nao conseguimos concluir esta conversao. Se o preview nao aparecer, envie o arquivo de novo.";
+
+export function convertFailureCopy(charged: boolean): string {
+  return charged ? CHARGED_READ_ERROR : UNCHARGED_READ_ERROR;
+}
+
 function emptyStatement(bank = "other"): Statement {
   return {
     bank,

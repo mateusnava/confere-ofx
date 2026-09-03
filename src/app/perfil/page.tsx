@@ -4,7 +4,12 @@ import { redirect } from "next/navigation";
 import { desc, eq } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
 import { PixCheckoutRefresh } from "@/components/PixCheckout";
-import { CREDIT_PACKS, formatCredits, parsePackKind } from "@/lib/credits";
+import {
+  CREDIT_PACKS,
+  formatCredits,
+  parsePackKind,
+  reconcilePendingPayments,
+} from "@/lib/credits";
 import { getDb } from "@/lib/db/client";
 import { payments } from "@/lib/db/schema";
 import { getUserByEmail } from "@/lib/quota";
@@ -17,6 +22,11 @@ export default async function PerfilPage() {
   const session = await auth();
   if (!session?.user?.email) {
     redirect("/login");
+  }
+
+  const existing = await getUserByEmail(session.user.email);
+  if (existing) {
+    await reconcilePendingPayments(getDb(), existing.id);
   }
 
   const user = await getUserByEmail(session.user.email);

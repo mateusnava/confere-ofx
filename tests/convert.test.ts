@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { convertExtracted } from "@/lib/convert";
+import { convertExtracted, convertFailureCopy } from "@/lib/convert";
 import type { ExtractedPdf } from "@/lib/pdf/extract";
 import type { Statement } from "@/lib/statement";
 
@@ -14,6 +14,17 @@ const sampleExtracted: ExtractedPdf = {
   pageCount: 1,
   byteSize: 80,
 };
+
+describe("convertFailureCopy", () => {
+  it("antes do persist diz que nada foi cobrado", () => {
+    expect(convertFailureCopy(false)).toMatch(/Nada foi cobrado/);
+  });
+
+  it("depois do persist nao afirma que nada foi cobrado", () => {
+    const copy = convertFailureCopy(true);
+    expect(copy.toLowerCase()).not.toMatch(/nada (foi )?cobrado/);
+  });
+});
 
 describe("convertExtracted", () => {
   it("sempre usa LLM em PDF nativo", async () => {

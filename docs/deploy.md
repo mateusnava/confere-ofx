@@ -20,10 +20,11 @@ Configure as variaveis em `.env.example`:
 - `GEMINI_API_KEY` — Google AI API key (Vercel AI SDK + `@ai-sdk/google`)
 - `GEMINI_MODEL` — default `gemini-3.6-flash` (Interactions API via `@ai-sdk/google`)
 - `MERCADOPAGO_ACCESS_TOKEN`
+- `MERCADOPAGO_WEBHOOK_SECRET` — se definido, `/api/pay/webhook` valida o HMAC `x-signature` do Mercado Pago
 - `RESEND_API_KEY`
 - `RESEND_FROM`
 - `CRON_SECRET`
-- `APP_URL`
+- `APP_URL` — URL publica do app (obrigatoria em producao). Cada Pix e criado com `notification_url=${APP_URL}/api/pay/webhook`. O Mercado Pago precisa alcancar essa rota; sem isso, credito so cai no poll ou na reconciliacao de `/comprar` e `/perfil`.
 
 O cron em `vercel.json` executa `/api/cron/purge-blobs` a cada minuto.
 

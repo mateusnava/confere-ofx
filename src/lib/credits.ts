@@ -1,6 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import type { Db } from "@/lib/db/client";
 import { payments, sessions, users } from "@/lib/db/schema";
+import { getPixStatus } from "@/lib/mp";
 
 export const CREDIT_PACKS = {
   pack_1: {
@@ -207,4 +208,38 @@ export async function creditPaidPayment(db: Db, mercadoPagoId: string) {
       })
       .where(eq(users.id, payment.userId));
   });
+}
+
+export async function markPaymentFailed(db: Db, mercadoPagoId: string) {
+  await db
+    .update(payments)
+    .set({ status: "failed" })
+    .where(
+      and(
+        eq(payments.mercadoPagoId, mercadoPagoId),
+        eq(payments.status, "pending"),
+      ),
+    );
+}
+
+export async function reconcilePendingPayments(db: Db, userId: string) {
+  const pendingRows = await db
+    .select({
+      id: payments.id,
+      mercadoPagoId: payments.mercadoPagoId,
+    })
+    .from(payments)
+    .where(and(eq(payments.userId, userId), eq(payments.status, "pending")));
+
+  for (const payment of pendingRows) {
+    if (!payment.mercadoPagoId) {
+      continue;
+    }
+    const status = await getPixStatus(payment.mercadoPagoId);
+    if (status === "paid") {
+      await creditPaidPayment(db, payment.mercadoPagoId);
+    } else if (status === "failed") {
+      await markPaymentFailed(db, payment.mercadoPagoId);
+    }
+  }
 }

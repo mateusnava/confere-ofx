@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { safeNextPath } from "@/lib/safe-next";
 import { LoginForm } from "./LoginForm";
 
 export const metadata: Metadata = {
@@ -8,11 +10,12 @@ export const metadata: Metadata = {
   description: "Entre ou crie sua conta com um codigo enviado no email.",
 };
 
-function safeNextPath(next: string | undefined): string {
-  if (next && next.startsWith("/") && !next.startsWith("//")) {
-    return next;
-  }
-  return "/perfil";
+async function requestOrigin() {
+  const headerList = await headers();
+  const host =
+    headerList.get("x-forwarded-host") ?? headerList.get("host") ?? "localhost:3000";
+  const proto = headerList.get("x-forwarded-proto") ?? "http";
+  return `${proto}://${host}`;
 }
 
 export default async function LoginPage({
@@ -21,9 +24,10 @@ export default async function LoginPage({
   const session = await auth();
   const params = await searchParams;
   const next = typeof params.next === "string" ? params.next : undefined;
+  const origin = await requestOrigin();
 
   if (session?.user?.email) {
-    redirect(safeNextPath(next));
+    redirect(safeNextPath(next, origin));
   }
 
   return (
@@ -40,7 +44,7 @@ export default async function LoginPage({
           acesso ja cria a conta.
         </p>
         <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
-          <LoginForm next={next} />
+          <LoginForm next={next} origin={origin} />
         </div>
       </div>
     </main>

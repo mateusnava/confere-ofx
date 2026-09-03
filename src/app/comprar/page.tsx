@@ -1,13 +1,18 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { PixCheckoutRefresh } from "@/components/PixCheckout";
-import { formatCredits } from "@/lib/credits";
+import { formatCredits, reconcilePendingPayments } from "@/lib/credits";
+import { getDb } from "@/lib/db/client";
 import { getUserByEmail } from "@/lib/quota";
 
 export default async function ComprarPage() {
   const session = await auth();
   if (!session?.user?.email) {
     redirect("/login?next=/comprar");
+  }
+  const existing = await getUserByEmail(session.user.email);
+  if (existing) {
+    await reconcilePendingPayments(getDb(), existing.id);
   }
   const user = await getUserByEmail(session.user.email);
 

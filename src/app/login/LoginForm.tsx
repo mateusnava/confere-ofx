@@ -3,8 +3,15 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { safeNextPath } from "@/lib/safe-next";
 
-export function LoginForm({ next }: { next?: string }) {
+export function LoginForm({
+  next,
+  origin,
+}: {
+  next?: string;
+  origin: string;
+}) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -59,9 +66,7 @@ export function LoginForm({ next }: { next?: string }) {
         throw new Error("Codigo invalido ou expirado");
       }
 
-      router.push(
-        next && next.startsWith("/") && !next.startsWith("//") ? next : "/perfil",
-      );
+      router.push(safeNextPath(next, origin));
       router.refresh();
     } catch (confirmError) {
       setError(

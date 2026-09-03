@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { checkBalance } from "@/lib/balance";
-import { convertExtracted } from "@/lib/convert";
+import { convertExtracted, convertFailureCopy } from "@/lib/convert";
 import { evaluateCredits, persistConversion } from "@/lib/credits";
 import { getDb } from "@/lib/db/client";
 import { classify, classifyImage } from "@/lib/pdf/classify";
@@ -25,36 +25,13 @@ function getIpAddress(request: Request): string {
 }
 
 export async function POST(request: Request) {
+  let charged = false;
   try {
     const body = (await request.json()) as {
       blobUrl: string;
       mimeType: string;
       password?: string;
     };
-
-    const { buffer } = await readUploadedFile(body.blobUrl);
-    const ipAddress = getIpAddress(request);
-    let classification = classifyImage();
-    let extracted;
-    let fileBuffer: Buffer | undefined;
-    let mimeType = body.mimeType;
-
-    if (isPdfMime(body.mimeType)) {
-      extracted = await extractPdf(buffer, body.password);
-      classification = classify(extracted);
-      fileBuffer = buffer;
-      mimeType = "application/pdf";
-    } else if (isImageMime(body.mimeType)) {
-      fileBuffer = buffer;
-      extracted = {
-        pages: [],
-        pageCount: 1,
-        byteSize: buffer.byteLength,
-      };
-      classification = classifyImage();
-    } else {
-      return NextResponse.json({ error: "Tipo de arquivo invalido" }, { status: 400 });
-    }
 
     const authSession = await auth();
     const user = authSession?.user?.email
@@ -83,6 +60,30 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+    }
+
+    const { buffer } = await readUploadedFile(body.blobUrl);
+    const ipAddress = getIpAddress(request);
+    let classification = classifyImage();
+    let extracted;
+    let fileBuffer: Buffer | undefined;
+    let mimeType = body.mimeType;
+
+    if (isPdfMime(body.mimeType)) {
+      extracted = await extractPdf(buffer, body.password);
+      classification = classify(extracted);
+      fileBuffer = buffer;
+      mimeType = "application/pdf";
+    } else if (isImageMime(body.mimeType)) {
+      fileBuffer = buffer;
+      extracted = {
+        pages: [],
+        pageCount: 1,
+        byteSize: buffer.byteLength,
+      };
+      classification = classifyImage();
+    } else {
+      return NextResponse.json({ error: "Tipo de arquivo invalido" }, { status: 400 });
     }
 
     const result = await convertExtracted(extracted!, {
@@ -116,7 +117,13 @@ export async function POST(request: Request) {
       );
     }
 
-    await deleteUploadedFile(body.blobUrl);
+    charged = true;
+
+    try {
+      await deleteUploadedFile(body.blobUrl);
+    } catch {
+      // Blob cleanup must not hide a charged convert.
+    }
 
     return NextResponse.json({
       sessionId: persisted.session.id,
@@ -129,11 +136,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "PASSWORD_REQUIRED" }, { status: 400 });
     }
 
+    console.error(error);
     return NextResponse.json(
-      {
-        error:
-          "Nao conseguimos ler este extrato. Nada foi cobrado. Tente outro arquivo.",
-      },
+      { error: convertFailureCopy(charged) },
       { status: 500 },
     );
   }
