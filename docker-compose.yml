@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: confere-ofx-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: confere
+      POSTGRES_PASSWORD: confere
+      POSTGRES_DB: confere_ofx
+    ports:
+      - "41783:5432"
+    volumes:
+      - confere_ofx_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U confere -d confere_ofx"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  confere_ofx_pgdata:
