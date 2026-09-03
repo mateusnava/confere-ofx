@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { PixCheckout } from "@/components/PixCheckout";
+import { PixCheckoutRefresh } from "@/components/PixCheckout";
 import { formatCredits } from "@/lib/credits";
 import { getUserByEmail } from "@/lib/quota";
 
@@ -19,7 +19,7 @@ export default async function ComprarPage() {
           Voce tem {formatCredits(user?.credits ?? 0)}. Creditos nao vencem.
         </p>
         <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
-          <PixCheckout />
+          <PixCheckoutRefresh />
         </div>
       </div>
     </main>

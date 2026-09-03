@@ -1,8 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { PixCheckout } from "@/components/PixCheckout";
 
 export function CreditWall() {
+  const router = useRouter();
+
   return (
     <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
       <h3 className="text-lg font-semibold text-amber-950">
@@ -12,7 +15,7 @@ export function CreditWall() {
         Depois de pagar, envie o PDF de novo.
       </p>
       <div className="mt-4">
-        <PixCheckout />
+        <PixCheckout onPaid={() => router.refresh()} />
       </div>
     </div>
   );

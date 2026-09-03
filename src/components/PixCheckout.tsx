@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CREDIT_PACKS, type PackKind } from "@/lib/credits";
 import { CreditPacks } from "@/components/CreditPacks";
+
+export function PixCheckoutRefresh() {
+  const router = useRouter();
+  return <PixCheckout onPaid={() => router.refresh()} />;
+}
 
 export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) {
   const [kind, setKind] = useState<PackKind>("pack_1");

@@ -59,7 +59,9 @@ export function LoginForm({ next }: { next?: string }) {
         throw new Error("Codigo invalido ou expirado");
       }
 
-      router.push(next && next.startsWith("/") ? next : "/perfil");
+      router.push(
+        next && next.startsWith("/") && !next.startsWith("//") ? next : "/perfil",
+      );
       router.refresh();
     } catch (confirmError) {
       setError(

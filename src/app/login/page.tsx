@@ -8,16 +8,23 @@ export const metadata: Metadata = {
   description: "Entre ou crie sua conta com um codigo enviado no email.",
 };
 
+function safeNextPath(next: string | undefined): string {
+  if (next && next.startsWith("/") && !next.startsWith("//")) {
+    return next;
+  }
+  return "/perfil";
+}
+
 export default async function LoginPage({
   searchParams,
 }: PageProps<"/login">) {
   const session = await auth();
-  if (session?.user?.email) {
-    redirect("/perfil");
-  }
-
   const params = await searchParams;
   const next = typeof params.next === "string" ? params.next : undefined;
+
+  if (session?.user?.email) {
+    redirect(safeNextPath(next));
+  }
 
   return (
     <main className="flex flex-1 justify-center bg-[#f4fbf9] px-6 py-16">

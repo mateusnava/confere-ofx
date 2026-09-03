@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { desc, eq } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
-import { PixCheckout } from "@/components/PixCheckout";
+import { PixCheckoutRefresh } from "@/components/PixCheckout";
 import { CREDIT_PACKS, formatCredits, parsePackKind } from "@/lib/credits";
 import { getDb } from "@/lib/db/client";
 import { payments } from "@/lib/db/schema";
@@ -60,7 +60,7 @@ export default async function PerfilPage() {
         <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-semibold text-slate-900">Comprar creditos</h2>
           <div className="mt-4">
-            <PixCheckout />
+            <PixCheckoutRefresh />
           </div>
         </section>
 
