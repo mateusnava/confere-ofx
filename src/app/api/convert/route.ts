@@ -10,9 +10,9 @@ import {
   isPdfMime,
   PasswordRequiredError,
 } from "@/lib/pdf/extract";
+import { auth } from "@/auth";
 import { evaluateQuota, getUserByEmail, recordUsage } from "@/lib/quota";
 import { deleteUploadedFile, readUploadedFile } from "@/lib/storage";
-import { cookies } from "next/headers";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -56,9 +56,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Tipo de arquivo invalido" }, { status: 400 });
     }
 
-    const cookieStore = await cookies();
-    const email = cookieStore.get("confere_email")?.value;
-    const user = email ? await getUserByEmail(email) : undefined;
+    const authSession = await auth();
+    const user = authSession?.user?.email
+      ? await getUserByEmail(authSession.user.email)
+      : undefined;
 
     const quota = await evaluateQuota(extracted?.pageCount ?? 1, {
       ipAddress,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ConvertProgress } from "@/components/ConvertProgress";
 import { Dropzone } from "@/components/Dropzone";
 import { Preview } from "@/components/Preview";
 import { SubscribeWall } from "@/components/SubscribeWall";
@@ -21,6 +22,7 @@ type SubscriptionRequiredResponse = {
 
 export default function PdfParaOfxPage() {
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [password, setPassword] = useState("");
   const [result, setResult] = useState<ConvertResponse | null>(null);
   const [subscriptionRequired, setSubscriptionRequired] =
@@ -84,6 +86,7 @@ export default function PdfParaOfxPage() {
         <div className="mt-10 space-y-6">
           <Dropzone
             disabled={loading}
+            onBusyChange={setUploading}
             onUploaded={(payload) => void convert(payload)}
           />
 
@@ -100,8 +103,8 @@ export default function PdfParaOfxPage() {
             />
           </label>
 
-          {loading ? (
-            <p className="text-sm text-slate-500">Convertendo extrato...</p>
+          {uploading || loading ? (
+            <ConvertProgress phase={uploading ? "upload" : "convert"} />
           ) : null}
           {error ? <p className="text-sm text-red-600">{error}</p> : null}
 

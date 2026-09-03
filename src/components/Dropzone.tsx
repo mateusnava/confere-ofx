@@ -6,11 +6,12 @@ import { upload } from "@vercel/blob/client";
 type DropzoneProps = {
   onUploaded: (payload: { blobUrl: string; mimeType: string }) => void;
   disabled?: boolean;
+  onBusyChange?: (busy: boolean) => void;
 };
 
 type UploadProvider = "local" | "vercel";
 
-export function Dropzone({ onUploaded, disabled }: DropzoneProps) {
+export function Dropzone({ onUploaded, disabled, onBusyChange }: DropzoneProps) {
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +68,7 @@ export function Dropzone({ onUploaded, disabled }: DropzoneProps) {
       if (!file) return;
 
       setUploading(true);
+      onBusyChange?.(true);
       setError(null);
 
       try {
@@ -83,9 +85,10 @@ export function Dropzone({ onUploaded, disabled }: DropzoneProps) {
         );
       } finally {
         setUploading(false);
+        onBusyChange?.(false);
       }
     },
-    [provider, uploadLocal, uploadVercel],
+    [onBusyChange, provider, uploadLocal, uploadVercel],
   );
 
   return (

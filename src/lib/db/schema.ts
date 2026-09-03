@@ -25,6 +25,16 @@ export const users = pgTable("users", {
     .defaultNow(),
 });
 
+export const verificationTokens = pgTable("verification_tokens", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull(),
+  codeHash: text("code_hash").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const sessions = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id),
