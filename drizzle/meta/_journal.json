@@ -15,6 +15,13 @@
       "when": 1756900000000,
       "tag": "0001_verification_tokens",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1756920000000,
+      "tag": "0002_credits",
+      "breakpoints": true
     }
   ]
 }

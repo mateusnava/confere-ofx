@@ -20,6 +20,8 @@ export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   email: text("email").notNull().unique(),
   plan: planEnum("plan").notNull().default("free"),
+  credits: integer("credits").notNull().default(0),
+  freeConversionUsed: boolean("free_conversion_used").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -46,6 +48,7 @@ export const sessions = pgTable("sessions", {
   pageCount: integer("page_count").notNull().default(1),
   paid: boolean("paid").notNull().default(false),
   paymentRequiredCents: integer("payment_required_cents").notNull().default(0),
+  creditSource: text("credit_source"),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
@@ -73,7 +76,7 @@ export const payments = pgTable("payments", {
   id: uuid("id").defaultRandom().primaryKey(),
   sessionId: uuid("session_id").references(() => sessions.id),
   userId: uuid("user_id").references(() => users.id),
-  mercadoPagoId: text("mercado_pago_id"),
+  mercadoPagoId: text("mercado_pago_id").unique(),
   amountCents: integer("amount_cents").notNull(),
   status: paymentStatusEnum("status").notNull().default("pending"),
   kind: text("kind").notNull(),
