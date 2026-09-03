@@ -1,5 +1,5 @@
 import ExcelJS from "exceljs";
-import type { BalanceCheck } from "@/lib/balance";
+import { balanceGapLabel, type BalanceCheck } from "@/lib/balance";
 import type { Statement } from "@/lib/statement";
 
 export async function toXlsx(
@@ -11,7 +11,7 @@ export async function toXlsx(
   if (!balance.ok) {
     const warning = workbook.addWorksheet("Aviso");
     warning.addRow([
-      "Saldo nao fecha. OFX nao disponivel. Revise os lancamentos antes de importar.",
+      `Saldo nao fecha. ${balanceGapLabel(balance)}. Revise os lancamentos antes de importar.`,
     ]);
   }
 

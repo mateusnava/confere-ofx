@@ -22,12 +22,20 @@ describe("export", () => {
     expect(ofx).toContain("<TRNAMT>50.00</TRNAMT>");
   });
 
-  it("toOfx null se saldo nao fecha", () => {
+  it("gera OFX com aviso se saldo nao fecha", () => {
     const broken = {
       ...statement,
       closingBalanceCents: 99999,
     };
-    expect(toOfx(broken, checkBalance(broken))).toBeNull();
+    const ofx = toOfx(broken, checkBalance(broken));
+    expect(ofx).toContain("<TRNAMT>50.00</TRNAMT>");
+    expect(ofx).toContain("AVISO: saldo nao fecha");
+    expect(ofx).toContain("Faltam R$ 879,99");
+  });
+
+  it("OFX sem aviso se saldo fecha", () => {
+    const ofx = toOfx(statement, checkBalance(statement));
+    expect(ofx).not.toContain("AVISO");
   });
 
   it("CSV header data,descricao,valor_centavos", () => {

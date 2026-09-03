@@ -1,4 +1,4 @@
-import type { BalanceCheck } from "@/lib/balance";
+import { balanceGapLabel, type BalanceCheck } from "@/lib/balance";
 import type { Statement } from "@/lib/statement";
 
 function formatAmount(amountCents: number): string {
@@ -12,11 +12,7 @@ function escapeOfx(value: string): string {
 export function toOfx(
   statement: Statement,
   balance: BalanceCheck,
-): string | null {
-  if (!balance.ok) {
-    return null;
-  }
-
+): string {
   const now = new Date().toISOString().replace(/[-:]/g, "").slice(0, 15);
   const transactions = statement.transactions
     .map((tx, index) => {
@@ -59,5 +55,9 @@ ${transactions}
 </STMTRS>
 </STMTTRNRS>
 </BANKMSGSRSV1>
-</OFX>`;
+</OFX>${
+    balance.ok
+      ? ""
+      : `\n<!-- AVISO: saldo nao fecha. ${balanceGapLabel(balance)}. Nao importe sem revisar. -->`
+  }`;
 }

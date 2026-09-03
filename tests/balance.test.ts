@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkBalance, sumCents } from "@/lib/balance";
+import { balanceGapLabel, checkBalance, sumCents } from "@/lib/balance";
 import type { Statement } from "@/lib/statement";
 
 function makeStatement(
@@ -61,6 +61,30 @@ describe("checkBalance", () => {
     });
 
     expect(checkBalance(statement).ok).toBe(true);
+  });
+
+  it("label faltam quando fechamento e maior", () => {
+    const statement = makeStatement({
+      openingBalanceCents: 10000,
+      closingBalanceCents: 12002,
+      transactions: [
+        { date: "2026-01-01", description: "Credito", amountCents: 2000 },
+      ],
+    });
+
+    expect(balanceGapLabel(checkBalance(statement))).toBe("Faltam R$ 0,02");
+  });
+
+  it("label sem saldos", () => {
+    const statement = makeStatement({
+      transactions: [
+        { date: "2026-01-01", description: "Credito", amountCents: 2000 },
+      ],
+    });
+
+    expect(balanceGapLabel(checkBalance(statement))).toBe(
+      "Sem saldo de abertura ou fechamento para conferir",
+    );
   });
 
   it("sem saldos => nao ok", () => {

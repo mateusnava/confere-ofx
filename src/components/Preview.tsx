@@ -1,4 +1,7 @@
-import type { BalanceCheck } from "@/lib/balance";
+"use client";
+
+import { useState } from "react";
+import { balanceGapLabel, type BalanceCheck } from "@/lib/balance";
 import type { Statement } from "@/lib/statement";
 
 type PreviewProps = {
@@ -15,6 +18,11 @@ function formatMoney(cents: number) {
 }
 
 export function Preview({ statement, balance, sessionId }: PreviewProps) {
+  const [acknowledged, setAcknowledged] = useState(false);
+  const ofxHref = `/api/export?sessionId=${sessionId}&format=ofx${
+    balance.ok ? "" : "&ack=1"
+  }`;
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -58,6 +66,24 @@ export function Preview({ statement, balance, sessionId }: PreviewProps) {
         </div>
       </div>
 
+      {balance.ok ? null : (
+        <div className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <p className="font-medium">
+            {balanceGapLabel(balance)}. Revise antes de importar no sistema do
+            contador.
+          </p>
+          <label className="mt-3 flex items-start gap-2">
+            <input
+              type="checkbox"
+              checked={acknowledged}
+              onChange={(event) => setAcknowledged(event.target.checked)}
+              className="mt-0.5"
+            />
+            <span>Entendi que o saldo nao fecha</span>
+          </label>
+        </div>
+      )}
+
       <div className="mt-6 overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="border-b text-slate-500">
@@ -80,16 +106,16 @@ export function Preview({ statement, balance, sessionId }: PreviewProps) {
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
-        {balance.ok ? (
+        {balance.ok || acknowledged ? (
           <a
-            href={`/api/export?sessionId=${sessionId}&format=ofx`}
+            href={ofxHref}
             className="rounded-full bg-[#0F6B5C] px-4 py-2 text-sm font-semibold text-white"
           >
-            Baixar OFX
+            {balance.ok ? "Baixar OFX" : "Baixar OFX mesmo assim"}
           </a>
         ) : (
           <span className="rounded-full bg-slate-200 px-4 py-2 text-sm text-slate-600">
-            OFX bloqueado ate o saldo fechar
+            Baixar OFX mesmo assim
           </span>
         )}
         <a

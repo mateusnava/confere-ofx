@@ -68,18 +68,14 @@ export default function PdfParaOfxPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f4fbf9] text-slate-900">
+    <main className="flex-1 bg-[#f4fbf9] text-slate-900">
       <div className="mx-auto max-w-5xl px-6 py-16">
         <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#0F6B5C]">
-            Confere OFX
-          </p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-            PDF vira OFX. So sai se o saldo fechar.
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Converter extrato
           </h1>
-          <p className="mt-4 text-lg text-slate-600">
-            Converta extratos bancarios brasileiros para OFX, Excel ou CSV.
-            Extracao feita por IA (Gemini).
+          <p className="mt-3 text-lg text-slate-600">
+            PDF, foto ou scan. Se o saldo nao fechar, voce confirma antes de baixar o OFX.
           </p>
         </div>
 

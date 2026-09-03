@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { users, verificationTokens } from "@/lib/db/schema";
@@ -21,6 +21,24 @@ export function codesMatch(left: string, right: string) {
     return false;
   }
   return timingSafeEqual(leftBuffer, rightBuffer);
+}
+
+export async function issueEmailCode(email: string) {
+  const normalized = email.trim().toLowerCase();
+  const code = String(randomInt(100000, 1000000));
+  const db = getDb();
+
+  await db
+    .delete(verificationTokens)
+    .where(eq(verificationTokens.email, normalized));
+
+  await db.insert(verificationTokens).values({
+    email: normalized,
+    codeHash: hashEmailCode(normalized, code),
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+  });
+
+  return { email: normalized, code };
 }
 
 export async function verifyEmailCode(email: string, code: string) {

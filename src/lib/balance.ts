@@ -35,3 +35,16 @@ export function checkBalance(statement: Statement): BalanceCheck {
     deltaCents,
   };
 }
+
+function formatReais(cents: number): string {
+  return (cents / 100).toFixed(2).replace(".", ",");
+}
+
+export function balanceGapLabel(balance: BalanceCheck): string {
+  if (balance.deltaCents === undefined) {
+    return "Sem saldo de abertura ou fechamento para conferir";
+  }
+
+  const amount = `R$ ${formatReais(Math.abs(balance.deltaCents))}`;
+  return balance.deltaCents > 0 ? `Faltam ${amount}` : `Sobram ${amount}`;
+}

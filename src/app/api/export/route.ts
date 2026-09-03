@@ -34,13 +34,15 @@ export async function GET(request: Request) {
   const balance = session.balance as BalanceCheck;
 
   if (format === "ofx") {
-    const ofx = toOfx(statement, balance);
-    if (!ofx) {
+    const acknowledged = searchParams.get("ack") === "1";
+    if (!balance.ok && !acknowledged) {
       return NextResponse.json(
-        { error: "OFX indisponivel porque o saldo nao fecha" },
+        { error: "OFX exige confirmacao porque o saldo nao fecha" },
         { status: 422 },
       );
     }
+
+    const ofx = toOfx(statement, balance);
 
     return new NextResponse(ofx, {
       headers: {
