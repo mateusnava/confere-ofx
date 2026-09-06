@@ -3,19 +3,14 @@
 ## Neon
 
 1. Crie um projeto Neon e copie `DATABASE_URL` (pooled) e `DATABASE_URL_UNPOOLED`.
-2. Rode migrations:
-
-```bash
-npm run db:generate
-npm run db:migrate
-```
+2. O `npm run build` (incluindo o da Vercel) roda `drizzle-kit migrate` antes do Next. As SQL em `drizzle/` precisam estar no repo — nao rode `db:generate` no deploy.
 
 ## Vercel
 
 Configure as variaveis em `.env.example`:
 
-- `DATABASE_URL`
-- `DATABASE_URL_UNPOOLED`
+- `DATABASE_URL` — runtime (pooled). Tambem serve de fallback no migrate.
+- `DATABASE_URL_UNPOOLED` — migrate no build. Marque Production/Preview e deixe disponivel no Build.
 - `BLOB_READ_WRITE_TOKEN`
 - `GEMINI_API_KEY` — Google AI API key (Vercel AI SDK + `@ai-sdk/google`)
 - `GEMINI_MODEL` — default `gemini-3.6-flash` (Interactions API via `@ai-sdk/google`)
