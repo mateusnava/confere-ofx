@@ -29,6 +29,47 @@
   gap: 1.1rem;
 }
 
+.artigos-foot {
+  background: #efe7d4;
+  color: #0f6b5c;
+  border-top: 1px solid color-mix(in oklch, #0f6b5c 12%, transparent);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.artigos-foot-inner {
+  width: min(800px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.15rem 0;
+}
+
+.artigos-foot .site-footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem 1.1rem;
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.artigos-foot .site-footer-nav a,
+.artigos-foot .site-footer-nav button {
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.artigos-foot .site-footer-nav a:hover,
+.artigos-foot .site-footer-nav button:hover {
+  text-decoration: underline;
+}
+
 .artigos {
   --ink: #1c2a26;
   --muted: #3d5c56;

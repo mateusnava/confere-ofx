@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Footer } from "@/components/Footer";
 import "./artigos.css";
 
 export default function ArtigosLayout({
@@ -18,6 +19,7 @@ export default function ArtigosLayout({
         </div>
       </header>
       {children}
+      <Footer variant="artigos" />
     </>
   );
 }

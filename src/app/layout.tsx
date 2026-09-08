@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Caveat, Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
+import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { SiteChrome } from "@/components/SiteChrome";
 import "./globals.css";
@@ -40,6 +41,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </SiteChrome>
         </Suspense>
         {children}
+        <Suspense>
+          <SiteChrome>
+            <Footer />
+          </SiteChrome>
+        </Suspense>
       </body>
     </html>
   );
