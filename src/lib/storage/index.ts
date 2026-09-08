@@ -1,4 +1,4 @@
-import { del } from "@vercel/blob";
+import { del, get } from "@vercel/blob";
 import {
   createLocalBlobUrl,
   deleteLocalFile,
@@ -6,12 +6,16 @@ import {
   isLocalBlobUrl,
   parseLocalFileId,
 } from "./local";
+import { BLOB_ACCESS } from "./upload";
 
 export function isBlobEnabled(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
 
-export async function readUploadedFile(url: string): Promise<{
+export async function readUploadedFile(
+  url: string,
+  options: { getBlob?: typeof get } = {},
+): Promise<{
   buffer: Buffer;
   mimeType: string;
 }> {
@@ -28,13 +32,17 @@ export async function readUploadedFile(url: string): Promise<{
     };
   }
 
-  const response = await fetch(url);
-  if (!response.ok) {
+  const getBlob = options.getBlob ?? get;
+  const result = await getBlob(url, { access: BLOB_ACCESS });
+  if (!result || result.statusCode !== 200 || !result.stream) {
     throw new Error("Nao foi possivel baixar o arquivo");
   }
 
-  const buffer = Buffer.from(await response.arrayBuffer());
-  const mimeType = response.headers.get("content-type") ?? "application/octet-stream";
+  const buffer = Buffer.from(await new Response(result.stream).arrayBuffer());
+  const mimeType =
+    result.blob.contentType ??
+    result.headers.get("content-type") ??
+    "application/octet-stream";
 
   return { buffer, mimeType };
 }
@@ -54,3 +62,4 @@ export async function deleteUploadedFile(url: string): Promise<void> {
 }
 
 export { createLocalBlobUrl, isLocalBlobUrl, storeLocalFile } from "./local";
+export { BLOB_ACCESS, blobPathnameFor, mimeTypeForUpload } from "./upload";

@@ -2,6 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { upload } from "@vercel/blob/client";
+import {
+  BLOB_ACCESS,
+  blobPathnameFor,
+  mimeTypeForUpload,
+} from "@/lib/storage/upload";
 
 type DropzoneProps = {
   onUploaded: (payload: { blobUrl: string; mimeType: string }) => void;
@@ -46,19 +51,26 @@ export function Dropzone({ onUploaded, disabled, onBusyChange }: DropzoneProps) 
 
     onUploaded({
       blobUrl: data.url,
-      mimeType: file.type,
+      mimeType: mimeTypeForUpload(file.name, file.type),
     });
   }, [onUploaded]);
 
   const uploadVercel = useCallback(async (file: File) => {
-    const blob = await upload(file.name, file, {
-      access: "public",
+    const contentType = mimeTypeForUpload(file.name, file.type);
+    if (!contentType) {
+      throw new Error("Tipo de arquivo invalido");
+    }
+
+    const blob = await upload(blobPathnameFor(file.name), file, {
+      access: BLOB_ACCESS,
+      contentType,
       handleUploadUrl: "/api/blob",
+      abortSignal: AbortSignal.timeout(30_000),
     });
 
     onUploaded({
       blobUrl: blob.url,
-      mimeType: file.type,
+      mimeType: contentType,
     });
   }, [onUploaded]);
 
@@ -78,10 +90,15 @@ export function Dropzone({ onUploaded, disabled, onBusyChange }: DropzoneProps) 
           await uploadLocal(file);
         }
       } catch (uploadError) {
+        const timedOut =
+          uploadError instanceof DOMException &&
+          uploadError.name === "TimeoutError";
         setError(
-          uploadError instanceof Error
-            ? uploadError.message
-            : "Falha no upload",
+          timedOut
+            ? "Upload demorou demais. Tente de novo."
+            : uploadError instanceof Error
+              ? uploadError.message
+              : "Falha no upload",
         );
       } finally {
         setUploading(false);

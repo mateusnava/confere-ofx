@@ -48,6 +48,7 @@ export async function POST(request: Request) {
       onBeforeGenerateToken: async () => ({
         allowedContentTypes: [...ALLOWED_TYPES],
         maximumSizeInBytes: MAX_BYTES,
+        addRandomSuffix: true,
         tokenPayload: JSON.stringify({ purpose: "convert" }),
       }),
       onUploadCompleted: async () => {},
