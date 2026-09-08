@@ -3,6 +3,7 @@ import { Caveat, Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { MixpanelProvider } from "@/components/MixpanelProvider";
 import { SiteChrome } from "@/components/SiteChrome";
 import { Toaster } from "@/components/Toaster";
 import "./globals.css";
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </SiteChrome>
         </Suspense>
         <Toaster />
+        <MixpanelProvider />
       </body>
     </html>
   );
