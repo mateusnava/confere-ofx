@@ -34,7 +34,9 @@ export default async function ArtigoPage({
     notFound();
   }
 
-  const others = ARTICLES.filter((item) => item.slug !== article.slug);
+  const others = ARTICLES.filter((item) => item.slug !== article.slug).sort(
+    (a, b) => b.date.localeCompare(a.date),
+  );
 
   return (
     <main className="artigos">
