@@ -19,6 +19,9 @@ export async function Header() {
           </span>
         </Link>
         <nav className="flex items-center gap-5 text-sm">
+          <Link href="/artigos" className="text-[#3d5c56] hover:text-[#0F6B5C]">
+            Artigos
+          </Link>
           <Link href="/pdf-para-ofx" className="text-[#3d5c56] hover:text-[#0F6B5C]">
             Converter
           </Link>
