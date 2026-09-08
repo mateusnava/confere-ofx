@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/auth";
+import { Footer } from "@/components/Footer";
 import { ProcessAnimation } from "@/components/ProcessAnimation";
 import { listArticles } from "@/lib/articles";
 import { CREDIT_PACKS, formatCredits } from "@/lib/credits";
@@ -17,6 +18,17 @@ export async function CarimboLanding({ labPad = false }: CarimboLandingProps) {
 
   return (
     <main className={`lab lab-carimbo${labPad ? "" : " lab-carimbo--site"}`}>
+      <svg className="lab-grain" aria-hidden>
+        <filter id="lab-grain-filter" x="0" y="0" width="100%" height="100%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.55"
+            numOctaves="4"
+            stitchTiles="stitch"
+          />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#lab-grain-filter)" />
+      </svg>
       <div className="lab-shell">
         <header>
           <Link href="/">Confere OFX</Link>
@@ -82,9 +94,9 @@ export async function CarimboLanding({ labPad = false }: CarimboLandingProps) {
             defaultMode="photo"
             showStamp={false}
             theme={{
-              paper: "#efe7d4",
-              ink: "#1c2a26",
-              accent: "#0F6B5C",
+              paper: "oklch(96.5% 0.012 95)",
+              ink: "oklch(27% 0.028 165)",
+              accent: "oklch(42% 0.074 172)",
             }}
           />
         </div>
@@ -147,6 +159,7 @@ export async function CarimboLanding({ labPad = false }: CarimboLandingProps) {
             ))}
           </ol>
         </section>
+        {labPad ? null : <Footer variant="landing" />}
       </div>
     </main>
   );
