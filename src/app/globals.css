@@ -38,6 +38,21 @@ body {
   animation: convert-pulse 1.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
+.toast-in {
+  animation: toast-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes convert-pulse {
   0%,
   100% {
@@ -52,7 +67,8 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .convert-progress-dot,
-  .convert-progress-current {
+  .convert-progress-current,
+  .toast-in {
     animation: none;
   }
 }

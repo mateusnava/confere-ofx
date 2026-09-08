@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { SiteChrome } from "@/components/SiteChrome";
+import { Toaster } from "@/components/Toaster";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Footer />
           </SiteChrome>
         </Suspense>
+        <Toaster />
       </body>
     </html>
   );

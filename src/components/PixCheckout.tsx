@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CREDIT_PACKS, type PackKind } from "@/lib/credits";
 import { CreditPacks } from "@/components/CreditPacks";
+import { showToast } from "@/components/Toaster";
+import { CREDIT_PACKS, formatCredits, type PackKind } from "@/lib/credits";
 
 export function PixCheckoutRefresh() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
   const [status, setStatus] = useState<"pending" | "paid" | "failed" | null>(
     null,
   );
+  const toastedPaid = useRef(false);
 
   async function refreshStatus(paymentId: string) {
     const response = await fetch(`/api/pay/pix?paymentId=${paymentId}`);
@@ -35,7 +37,12 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
     }
     setStatus(data.status ?? "pending");
     if (data.status === "paid") {
-      onPaid?.(data.credits ?? 0);
+      const credits = data.credits ?? 0;
+      if (!toastedPaid.current) {
+        toastedPaid.current = true;
+        showToast("Pagamento confirmado", `Voce tem ${formatCredits(credits)}.`);
+      }
+      onPaid?.(credits);
       setPix(null);
     }
   }
@@ -65,6 +72,7 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
       }
       setPix(data);
       setStatus("pending");
+      toastedPaid.current = false;
     } catch (buyError) {
       setError(buyError instanceof Error ? buyError.message : "Erro ao gerar Pix");
     } finally {
