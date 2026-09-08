@@ -109,6 +109,7 @@ export function ConvertClient() {
               statement={result.statement}
               balance={result.balance}
               sessionId={result.sessionId}
+              expiresAt={result.expiresAt}
             />
           ) : null}
         </div>

@@ -12,6 +12,7 @@ import {
   PasswordRequiredError,
 } from "@/lib/pdf/extract";
 import { getUserByEmail } from "@/lib/quota";
+import { SESSION_TTL_MS } from "@/lib/session";
 import { deleteUploadedFile, readUploadedFile } from "@/lib/storage";
 
 export const runtime = "nodejs";
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
       mimeType,
     });
 
-    const expiresAt = new Date(Date.now() + 60_000);
+    const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
     const balance = checkBalance(result.statement);
 
     const persisted = await persistConversion(getDb(), {

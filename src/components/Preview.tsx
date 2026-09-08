@@ -1,13 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { balanceGapLabel, type BalanceCheck } from "@/lib/balance";
+import {
+  EXPORT_FILENAMES,
+  exportErrorMessage,
+  exportUrl,
+  filenameFromDisposition,
+  type ExportFormat,
+} from "@/lib/export/client";
+import {
+  formatRemainingSession,
+  remainingSessionMs,
+  SESSION_EXPIRED_COPY,
+} from "@/lib/session";
 import type { Statement } from "@/lib/statement";
 
 type PreviewProps = {
   statement: Statement;
   balance: BalanceCheck;
   sessionId: string;
+  expiresAt: string;
 };
 
 function formatMoney(cents: number) {
@@ -42,11 +55,74 @@ function bankLabel(bank: string) {
   return BANK_LABELS[key] ?? bank;
 }
 
-export function Preview({ statement, balance, sessionId }: PreviewProps) {
+export function Preview({
+  statement,
+  balance,
+  sessionId,
+  expiresAt,
+}: PreviewProps) {
   const [acknowledged, setAcknowledged] = useState(false);
-  const ofxHref = `/api/export?sessionId=${sessionId}&format=ofx${
-    balance.ok ? "" : "&ack=1"
-  }`;
+  const [remainingMs, setRemainingMs] = useState(() =>
+    remainingSessionMs(expiresAt),
+  );
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<ExportFormat | null>(null);
+  const expired = remainingMs <= 0;
+  const canDownloadOfx = !expired && (balance.ok || acknowledged);
+
+  useEffect(() => {
+    setRemainingMs(remainingSessionMs(expiresAt));
+    const id = window.setInterval(() => {
+      const next = remainingSessionMs(expiresAt);
+      setRemainingMs(next);
+      if (next <= 0) window.clearInterval(id);
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [expiresAt]);
+
+  async function download(format: ExportFormat) {
+    if (expired) {
+      setDownloadError(SESSION_EXPIRED_COPY);
+      return;
+    }
+
+    setDownloading(format);
+    setDownloadError(null);
+
+    try {
+      const response = await fetch(
+        exportUrl(sessionId, format, !balance.ok),
+      );
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        if (response.status === 404) {
+          setRemainingMs(0);
+        }
+        setDownloadError(exportErrorMessage(response.status, body));
+        return;
+      }
+
+      const blob = await response.blob();
+      const filename = filenameFromDisposition(
+        response.headers.get("Content-Disposition"),
+        EXPORT_FILENAMES[format],
+      );
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      setDownloadError("Nao foi possivel baixar");
+    } finally {
+      setDownloading(null);
+    }
+  }
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -57,6 +133,13 @@ export function Preview({ statement, balance, sessionId }: PreviewProps) {
           </h2>
           <p className="text-sm text-slate-500">
             {bankLabel(statement.bank)} · {statement.kind}
+          </p>
+          <p
+            className={`mt-1 text-sm ${
+              expired ? "text-red-600" : "text-slate-500"
+            }`}
+          >
+            {formatRemainingSession(remainingMs)}
           </p>
         </div>
         <span
@@ -132,31 +215,54 @@ export function Preview({ statement, balance, sessionId }: PreviewProps) {
         </table>
       </div>
 
+      {downloadError ? (
+        <p className="mt-6 text-sm text-red-600">{downloadError}</p>
+      ) : null}
+
       <div className="mt-6 flex flex-wrap gap-3">
-        {balance.ok || acknowledged ? (
-          <a
-            href={ofxHref}
-            className="rounded-full bg-[#0F6B5C] px-4 py-2 text-sm font-semibold text-white"
+        {canDownloadOfx ? (
+          <button
+            type="button"
+            disabled={downloading !== null}
+            onClick={() => void download("ofx")}
+            className="rounded-full bg-[#0F6B5C] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
             {balance.ok ? "Baixar OFX" : "Baixar OFX mesmo assim"}
-          </a>
+          </button>
         ) : (
           <span className="rounded-full bg-slate-200 px-4 py-2 text-sm text-slate-600">
-            Baixar OFX mesmo assim
+            {balance.ok ? "Baixar OFX" : "Baixar OFX mesmo assim"}
           </span>
         )}
-        <a
-          href={`/api/export?sessionId=${sessionId}&format=csv`}
-          className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
-        >
-          Baixar CSV
-        </a>
-        <a
-          href={`/api/export?sessionId=${sessionId}&format=xlsx`}
-          className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
-        >
-          Baixar Excel
-        </a>
+        {expired ? (
+          <>
+            <span className="rounded-full bg-slate-200 px-4 py-2 text-sm text-slate-600">
+              Baixar CSV
+            </span>
+            <span className="rounded-full bg-slate-200 px-4 py-2 text-sm text-slate-600">
+              Baixar Excel
+            </span>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              disabled={downloading !== null}
+              onClick={() => void download("csv")}
+              className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 disabled:opacity-60"
+            >
+              Baixar CSV
+            </button>
+            <button
+              type="button"
+              disabled={downloading !== null}
+              onClick={() => void download("xlsx")}
+              className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 disabled:opacity-60"
+            >
+              Baixar Excel
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

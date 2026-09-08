@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { checkBalance } from "@/lib/balance";
+import {
+  exportErrorMessage,
+  exportUrl,
+  filenameFromDisposition,
+} from "@/lib/export/client";
 import { toCsv } from "@/lib/export/csv";
 import { toOfx } from "@/lib/export/ofx";
+import { SESSION_EXPIRED_COPY } from "@/lib/session";
 import type { Statement } from "@/lib/statement";
 
 const statement: Statement = {
@@ -42,5 +48,30 @@ describe("export", () => {
     expect(toCsv(statement).split("\n")[0]).toBe(
       "data,descricao,valor_centavos",
     );
+  });
+
+  it("404 de export vira aviso de sessao expirada", () => {
+    expect(exportErrorMessage(404, { error: "Sessao expirada" })).toBe(
+      SESSION_EXPIRED_COPY,
+    );
+  });
+
+  it("monta URL de export sem sair da pagina", () => {
+    expect(exportUrl("abc", "csv")).toBe(
+      "/api/export?sessionId=abc&format=csv",
+    );
+    expect(exportUrl("abc", "ofx", true)).toBe(
+      "/api/export?sessionId=abc&format=ofx&ack=1",
+    );
+  });
+
+  it("lê filename do Content-Disposition", () => {
+    expect(
+      filenameFromDisposition(
+        'attachment; filename="extrato.ofx"',
+        "fallback.ofx",
+      ),
+    ).toBe("extrato.ofx");
+    expect(filenameFromDisposition(null, "extrato.csv")).toBe("extrato.csv");
   });
 });
