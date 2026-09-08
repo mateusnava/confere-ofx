@@ -6,38 +6,31 @@ type ConvertProgressProps = {
   phase: "upload" | "convert";
 };
 
-const CONVERT_MESSAGES = [
-  "Lendo as linhas do extrato...",
-  "Separando Pix de boleto...",
-  "Somando crédito e débito...",
-  "Conferindo se o saldo fecha...",
-  "Montando o OFX...",
-];
-
-const UPLOAD_MESSAGES = [
-  "Recebendo o arquivo...",
-  "O PDF some em 60 segundos. Combinado.",
-];
-
-const LEDGER_ROWS = [
-  ["01 SET", "Pix recebido", "+ 50,00"],
-  ["02 SET", "Padaria do Bairro", "- 12,40"],
-  ["03 SET", "TED salario", "+ 3.200,00"],
-  ["04 SET", "Conta de luz", "- 187,90"],
-  ["05 SET", "Saldo final", "3.049,70"],
+const STEPS = [
+  "Recebendo arquivo",
+  "Lendo documento",
+  "Extraindo lançamentos",
+  "Conferindo saldo",
+  "Gerando OFX",
 ] as const;
 
 export function ConvertProgress({ phase }: ConvertProgressProps) {
-  const messages = phase === "upload" ? UPLOAD_MESSAGES : CONVERT_MESSAGES;
-  const [messageIndex, setMessageIndex] = useState(0);
+  const [stepIndex, setStepIndex] = useState(phase === "upload" ? 0 : 1);
 
   useEffect(() => {
-    setMessageIndex(0);
+    if (phase === "upload") {
+      setStepIndex(0);
+      return;
+    }
+
+    setStepIndex(1);
     const interval = window.setInterval(() => {
-      setMessageIndex((current) => (current + 1) % messages.length);
+      setStepIndex((current) =>
+        current >= STEPS.length - 1 ? current : current + 1,
+      );
     }, 2200);
     return () => window.clearInterval(interval);
-  }, [messages.length, phase]);
+  }, [phase]);
 
   return (
     <div
@@ -48,43 +41,66 @@ export function ConvertProgress({ phase }: ConvertProgressProps) {
     >
       <div className="flex items-center justify-between border-b border-[#0F6B5C]/10 px-5 py-3">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0F6B5C]">
-          Conferencia ao vivo
+          Processando extrato
         </p>
         <span className="convert-progress-dot h-2 w-2 rounded-full bg-[#0F6B5C]" />
       </div>
 
-      <div className="relative px-5 py-5">
-        <div className="convert-progress-scan pointer-events-none absolute inset-x-5 top-5 h-10 rounded-lg bg-[#0F6B5C]/8" />
+      <ol className="px-5 py-5">
+        {STEPS.map((label, index) => {
+          const state =
+            index < stepIndex
+              ? "done"
+              : index === stepIndex
+                ? "current"
+                : "pending";
 
-        <ul className="relative space-y-2 font-mono text-sm">
-          {LEDGER_ROWS.map(([date, label, amount], index) => (
-            <li
-              key={date}
-              className="convert-progress-row flex items-center gap-3 text-[#3d5c56]"
-              style={{ animationDelay: `${index * 420}ms` }}
-            >
-              <span className="convert-progress-check grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#0F6B5C] text-[10px] font-bold text-[#f4fbf9]">
-                ✓
-              </span>
-              <span className="w-14 text-xs text-[#6b8a84]">{date}</span>
-              <span className="flex-1 truncate">{label}</span>
-              <span
-                className={
-                  amount.startsWith("-")
-                    ? "text-[#9a3b2f]"
-                    : "text-[#0F6B5C]"
-                }
+          return (
+            <li key={label} className="flex gap-3">
+              <div className="flex w-5 shrink-0 flex-col items-center">
+                <span
+                  className={
+                    state === "pending"
+                      ? "grid h-5 w-5 place-items-center rounded-full border border-[#0F6B5C]/25 text-[10px] font-semibold text-[#6b8a84]"
+                      : state === "current"
+                        ? "convert-progress-current grid h-5 w-5 place-items-center rounded-full bg-[#0F6B5C] text-[10px] font-semibold text-[#f4fbf9]"
+                        : "grid h-5 w-5 place-items-center rounded-full bg-[#0F6B5C] text-[10px] font-bold text-[#f4fbf9]"
+                  }
+                >
+                  {state === "done" ? "✓" : index + 1}
+                </span>
+                {index < STEPS.length - 1 ? (
+                  <span
+                    className={
+                      state === "done"
+                        ? "w-px flex-1 bg-[#0F6B5C]/40"
+                        : "w-px flex-1 bg-[#0F6B5C]/12"
+                    }
+                  />
+                ) : null}
+              </div>
+              <p
+                className={`${index < STEPS.length - 1 ? "pb-4" : ""} ${
+                  state === "pending"
+                    ? "text-sm text-[#6b8a84]"
+                    : state === "current"
+                      ? "text-sm font-medium text-[#0F6B5C]"
+                      : "text-sm text-[#3d5c56]"
+                }`}
               >
-                {amount}
-              </span>
+                {label}
+              </p>
             </li>
-          ))}
-        </ul>
-      </div>
+          );
+        })}
+      </ol>
 
-      <p className="border-t border-[#0F6B5C]/10 px-5 py-3 text-sm text-[#0F6B5C]">
-        {messages[messageIndex]}
-      </p>
+      <div className="border-t border-[#0F6B5C]/10 px-5 py-3">
+        <p className="text-sm text-[#0F6B5C]">{STEPS[stepIndex]}...</p>
+        <p className="mt-1 text-xs text-[#6b8a84]">
+          O arquivo é excluído automaticamente em 60 segundos.
+        </p>
+      </div>
     </div>
   );
 }
