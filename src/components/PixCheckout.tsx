@@ -40,7 +40,10 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
       const credits = data.credits ?? 0;
       if (!toastedPaid.current) {
         toastedPaid.current = true;
-        showToast("Pagamento confirmado", `Voce tem ${formatCredits(credits)}.`);
+        showToast(
+          "Pagamento confirmado",
+          `Voce tem ${formatCredits(credits)}. Faca a consulta novamente e use o credito.`,
+        );
       }
       onPaid?.(credits);
       setPix(null);
@@ -78,6 +81,14 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
     } finally {
       setLoading(false);
     }
+  }
+
+  if (status === "paid") {
+    return (
+      <p className="text-sm text-[#0F6B5C]">
+        Pagamento confirmado. Faca a consulta novamente e use o credito.
+      </p>
+    );
   }
 
   return (

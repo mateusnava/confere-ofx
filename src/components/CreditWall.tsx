@@ -1,10 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PixCheckout } from "@/components/PixCheckout";
 
-export function CreditWall() {
+export function CreditWall({ onPaid }: { onPaid?: () => void }) {
   const router = useRouter();
+  const [paid, setPaid] = useState(false);
+
+  if (paid) {
+    return null;
+  }
 
   return (
     <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
@@ -15,7 +21,13 @@ export function CreditWall() {
         Depois de pagar, envie o PDF de novo.
       </p>
       <div className="mt-4">
-        <PixCheckout onPaid={() => router.refresh()} />
+        <PixCheckout
+          onPaid={() => {
+            setPaid(true);
+            onPaid?.();
+            router.refresh();
+          }}
+        />
       </div>
     </div>
   );

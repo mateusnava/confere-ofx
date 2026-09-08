@@ -102,7 +102,9 @@ export function ConvertClient() {
           ) : null}
           {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
-          {creditsRequired ? <CreditWall /> : null}
+          {creditsRequired ? (
+            <CreditWall onPaid={() => setCreditsRequired(false)} />
+          ) : null}
 
           {result ? (
             <Preview
