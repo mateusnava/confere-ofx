@@ -13,7 +13,7 @@ export type ConvertResult = {
 const UNCHARGED_READ_ERROR =
   "Nao conseguimos ler este extrato. Nada foi cobrado. Tente outro arquivo.";
 const CHARGED_READ_ERROR =
-  "Nao conseguimos concluir esta conversao. Se o preview nao aparecer, envie o arquivo de novo.";
+  "Nao conseguimos concluir esta conversao. Se a conferencia nao aparecer, envie o arquivo de novo.";
 
 export function convertFailureCopy(charged: boolean): string {
   return charged ? CHARGED_READ_ERROR : UNCHARGED_READ_ERROR;

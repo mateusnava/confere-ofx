@@ -44,7 +44,7 @@ export function LabSwitcher() {
           href="/"
           className="rounded-full px-3 py-1.5 text-xs font-semibold text-[#3d5c56] hover:bg-[#0F6B5C]/10"
         >
-          Home atual
+          Página inicial
         </Link>
       </nav>
     </div>

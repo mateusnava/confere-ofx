@@ -30,7 +30,7 @@ export default function ScannerLandingPage() {
 
         <div className="platen">
           <div className="platen-label">
-            <span>Vidro do scanner</span>
+            <span>Vidro da máquina</span>
             <span>Foto ligada</span>
           </div>
           <ProcessAnimation

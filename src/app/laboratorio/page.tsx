@@ -9,14 +9,14 @@ export default function LaboratorioIndexPage() {
           Laboratorio
         </p>
         <h1 className="mt-3 text-4xl font-bold tracking-tight">
-          Quatro versoes da landing
+          Quatro versoes da pagina inicial
         </h1>
         <p className="mt-4 max-w-xl text-lg text-[#3d5c56]">
-          A home atual continua em{" "}
+          A página inicial atual continua em{" "}
           <Link href="/" className="font-semibold text-[#0F6B5C] underline">
             /
           </Link>
-          . Scanner/Xerox e a mais trabalhada. Mesa, Scanner e Carimbo abrem na
+          . Xerox/vidraça e a mais trabalhada. Mesa, Xerox e Carimbo abrem na
           foto manuscrita.
         </p>
         <ol className="mt-12 space-y-4">

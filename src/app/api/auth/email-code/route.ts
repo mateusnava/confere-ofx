@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const email = body.email?.trim().toLowerCase() ?? "";
 
     if (!email || !email.includes("@")) {
-      return NextResponse.json({ error: "Email obrigatorio" }, { status: 400 });
+      return NextResponse.json({ error: "E-mail obrigatorio" }, { status: 400 });
     }
 
     const { code } = await issueEmailCode(email);

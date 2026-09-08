@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const format = searchParams.get("format") ?? "json";
 
   if (!sessionId) {
-    return NextResponse.json({ error: "sessionId obrigatorio" }, { status: 400 });
+    return NextResponse.json({ error: "Sessao obrigatoria" }, { status: 400 });
   }
 
   const db = getDb();

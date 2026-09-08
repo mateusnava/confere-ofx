@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   title: "Perfil | Confere OFX",
 };
 
+function paymentStatusLabel(status: string) {
+  if (status === "paid") return "pago";
+  if (status === "pending") return "pendente";
+  if (status === "failed") return "falhou";
+  return status;
+}
+
 export default async function PerfilPage() {
   const session = await auth();
   if (!session?.user?.email) {
@@ -56,7 +63,7 @@ export default async function PerfilPage() {
         </h1>
 
         <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-sm text-[#6b8a84]">Email</p>
+          <p className="text-sm text-[#6b8a84]">E-mail</p>
           <p className="mt-1 font-medium text-slate-900">{session.user.email}</p>
           <p className="mt-5 text-sm text-[#6b8a84]">Creditos</p>
           <p className="mt-1 font-medium text-[#0F6B5C]">
@@ -83,7 +90,7 @@ export default async function PerfilPage() {
                 const price = kind ? CREDIT_PACKS[kind].price : null;
                 return (
                   <li key={payment.id}>
-                    {payment.status}
+                    {paymentStatusLabel(payment.status)}
                     {price ? ` · ${price}` : null}
                   </li>
                 );

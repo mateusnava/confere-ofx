@@ -15,8 +15,8 @@ export const LAB_VERSIONS = [
   },
   {
     slug: "scanner",
-    title: "Scanner / xerox",
-    blurb: "Luz fria, linha de scan, documento na vidraca.",
+    title: "Xerox / vidraça",
+    blurb: "Luz fria, faixa de luz, documento na vidraca.",
     ink: "#141414",
     paper: "#e8ead4",
   },

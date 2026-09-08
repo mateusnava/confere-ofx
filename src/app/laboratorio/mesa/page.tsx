@@ -16,7 +16,7 @@ export default function MesaLandingPage() {
             <h1>Ate letra de mao vira OFX.</h1>
             <p className="hand-note">manda a foto do caderno</p>
             <p className="lead">
-              Extrato impresso, print do app ou rascunho. A gente le e so deixa
+              Extrato impresso, foto do app ou rascunho. A gente le e so deixa
               baixar se o saldo fechar.
             </p>
             <div className="actions">

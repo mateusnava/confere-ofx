@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Upload local requer multipart/form-data. Vercel Blob nao configurado.",
+          "Envio do arquivo falhou. Tente de novo.",
       },
       { status: 400 },
     );
@@ -58,8 +58,7 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Erro ao enviar arquivo",
+        error: "Erro ao enviar arquivo",
       },
       { status: 400 },
     );
@@ -98,7 +97,10 @@ export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const url = searchParams.get("url");
   if (!url) {
-    return NextResponse.json({ error: "url obrigatoria" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Endereco do arquivo obrigatorio" },
+      { status: 400 },
+    );
   }
 
   if (!isBlobEnabled()) {

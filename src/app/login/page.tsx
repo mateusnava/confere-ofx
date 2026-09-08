@@ -7,7 +7,7 @@ import { LoginForm } from "./LoginForm";
 
 export const metadata: Metadata = {
   title: "Entrar | Confere OFX",
-  description: "Entre ou crie sua conta com um codigo enviado no email.",
+  description: "Entre ou crie sua conta com um codigo enviado no e-mail.",
 };
 
 async function requestOrigin() {
@@ -40,7 +40,7 @@ export default async function LoginPage({
           Entre ou crie sua conta
         </h1>
         <p className="mt-3 text-[#3d5c56]">
-          Sem senha. Enviamos um codigo de 6 digitos no seu email. O primeiro
+          Sem senha. Enviamos um codigo de 6 digitos no seu e-mail. O primeiro
           acesso ja cria a conta.
         </p>
         <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">

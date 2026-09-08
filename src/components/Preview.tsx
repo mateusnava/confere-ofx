@@ -17,6 +17,31 @@ function formatMoney(cents: number) {
   });
 }
 
+function formatDate(iso: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!match) return iso;
+  return `${match[3]}/${match[2]}/${match[1]}`;
+}
+
+const BANK_LABELS: Record<string, string> = {
+  nubank: "Nubank",
+  inter: "Inter",
+  itau: "Itaú",
+  bradesco: "Bradesco",
+  bb: "Banco do Brasil",
+  santander: "Santander",
+  c6: "C6",
+  caixa: "Caixa",
+  other: "Banco não identificado",
+  unknown: "Banco não identificado",
+};
+
+function bankLabel(bank: string) {
+  const key = bank.trim().toLowerCase();
+  if (!key) return BANK_LABELS.other;
+  return BANK_LABELS[key] ?? bank;
+}
+
 export function Preview({ statement, balance, sessionId }: PreviewProps) {
   const [acknowledged, setAcknowledged] = useState(false);
   const ofxHref = `/api/export?sessionId=${sessionId}&format=ofx${
@@ -27,9 +52,11 @@ export function Preview({ statement, balance, sessionId }: PreviewProps) {
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">Preview do extrato</h2>
+          <h2 className="text-xl font-semibold text-slate-900">
+            Conferência do extrato
+          </h2>
           <p className="text-sm text-slate-500">
-            {statement.bank.toUpperCase()} · {statement.kind}
+            {bankLabel(statement.bank)} · {statement.kind}
           </p>
         </div>
         <span
@@ -96,7 +123,7 @@ export function Preview({ statement, balance, sessionId }: PreviewProps) {
           <tbody>
             {statement.transactions.map((tx) => (
               <tr key={`${tx.date}-${tx.description}-${tx.amountCents}`} className="border-b border-slate-100">
-                <td className="py-2 pr-4">{tx.date}</td>
+                <td className="py-2 pr-4">{formatDate(tx.date)}</td>
                 <td className="py-2 pr-4">{tx.description}</td>
                 <td className="py-2">{formatMoney(tx.amountCents)}</td>
               </tr>

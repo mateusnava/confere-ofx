@@ -18,12 +18,12 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Entre na sua conta" }, { status: 401 });
     }
 
     const user = await getUserByEmail(session.user.email);
     if (!user) {
-      return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Entre na sua conta" }, { status: 401 });
     }
 
     const body = (await request.json()) as { kind?: unknown };
@@ -52,14 +52,12 @@ export async function POST(request: Request) {
         idempotencyKey: payment.id,
         payerEmail: user.email,
       });
-    } catch (error) {
+    } catch {
       await db
         .update(payments)
         .set({ status: "failed" })
         .where(eq(payments.id, payment.id));
-      const message =
-        error instanceof Error ? error.message : "Falha ao criar Pix";
-      return NextResponse.json({ error: message }, { status: 502 });
+      return NextResponse.json({ error: "Falha ao criar Pix" }, { status: 502 });
     }
 
     await db
@@ -83,17 +81,20 @@ export async function GET(request: Request) {
   try {
     const session = await auth();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Entre na sua conta" }, { status: 401 });
     }
 
     const user = await getUserByEmail(session.user.email);
     if (!user) {
-      return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Entre na sua conta" }, { status: 401 });
     }
 
     const paymentId = new URL(request.url).searchParams.get("paymentId");
     if (!paymentId) {
-      return NextResponse.json({ error: "paymentId obrigatorio" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Pagamento obrigatorio" },
+        { status: 400 },
+      );
     }
 
     const db = getDb();

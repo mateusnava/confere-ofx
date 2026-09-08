@@ -133,7 +133,10 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (error instanceof PasswordRequiredError) {
-      return NextResponse.json({ error: "PASSWORD_REQUIRED" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Este PDF pede senha. Informe a senha e tente de novo." },
+        { status: 400 },
+      );
     }
 
     console.error(error);

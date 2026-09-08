@@ -124,11 +124,13 @@ export default function PrivacidadePage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-slate-900">Cookies</h2>
+            <h2 className="text-xl font-semibold text-slate-900">
+              Arquivos do navegador
+            </h2>
             <p className="leading-relaxed text-[#3d5c56]">
-              Usamos cookies e armazenamento local só para manter a sessão
-              autenticada e o funcionamento do site. Não usamos rede de
-              anúncio de terceiros nesta política.
+              Usamos arquivos do navegador e armazenamento local só para
+              manter a sessão autenticada e o funcionamento do site. Não
+              usamos rede de anúncio de terceiros nesta política.
             </p>
           </section>
         </div>

@@ -46,7 +46,7 @@ export function Dropzone({ onUploaded, disabled, onBusyChange }: DropzoneProps) 
 
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.error ?? "Falha no upload local");
+      throw new Error(data.error ?? "Falha no envio do arquivo");
     }
 
     onUploaded({
@@ -95,10 +95,10 @@ export function Dropzone({ onUploaded, disabled, onBusyChange }: DropzoneProps) 
           uploadError.name === "TimeoutError";
         setError(
           timedOut
-            ? "Upload demorou demais. Tente de novo."
+            ? "O envio demorou demais. Tente de novo."
             : uploadError instanceof Error
               ? uploadError.message
-              : "Falha no upload",
+              : "Falha no envio",
         );
       } finally {
         setUploading(false);
@@ -134,7 +134,7 @@ export function Dropzone({ onUploaded, disabled, onBusyChange }: DropzoneProps) 
       </p>
       {provider === "local" ? (
         <p className="mt-2 text-xs text-slate-400">
-          Modo local: upload sem Vercel Blob.
+          Modo local: o arquivo fica neste computador.
         </p>
       ) : null}
       <label className="mt-6 inline-flex cursor-pointer rounded-full bg-[#0F6B5C] px-5 py-2 text-sm font-semibold text-white hover:bg-teal-800">

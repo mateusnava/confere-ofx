@@ -131,7 +131,7 @@ function ContactModal({
         {sent ? (
           <div className="mt-6">
             <p className="text-[#3d5c56]">
-              Mensagem enviada. Respondemos no seu email.
+              Mensagem enviada. Respondemos no seu e-mail.
             </p>
             <button
               type="button"
@@ -169,7 +169,7 @@ function ContactModal({
                 </label>
                 <label className="block">
                   <span className="text-sm font-medium text-[#3d5c56]">
-                    Email
+                    E-mail
                   </span>
                   <input
                     type="email"

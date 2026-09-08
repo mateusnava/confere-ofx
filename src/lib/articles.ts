@@ -22,7 +22,7 @@ export const ARTICLES: Article[] = [
     blocks: [
       {
         type: "p",
-        text: "OFX significa Open Financial Exchange. Na prática, é um arquivo de texto com data, valor e descrição de cada lançamento da conta. O sistema de contabilidade lê esse arquivo e monta o livro-caixa sem alguém copiar linha por linha.",
+        text: "OFX é o arquivo de extrato que o programa do contador importa. Na prática, é um arquivo de texto com data, valor e descrição de cada lançamento da conta. O sistema de contabilidade lê esse arquivo e monta o livro-caixa sem alguém copiar linha por linha.",
       },
       {
         type: "p",
@@ -93,7 +93,7 @@ export const ARTICLES: Article[] = [
       },
       {
         type: "p",
-        text: "Também vale. Foto do aplicativo, scan ou página de caderno, mesmo torta. A leitura é a mesma: cada linha vira lançamento, a soma precisa fechar.",
+        text: "Também vale. Foto do aplicativo, cópia do papel ou página de caderno, mesmo torta. A leitura é a mesma: cada linha vira lançamento, a soma precisa fechar.",
       },
       {
         type: "h2",
@@ -151,7 +151,7 @@ export const ARTICLES: Article[] = [
       },
       {
         type: "p",
-        text: "Um OFX com linha faltando ou valor invertido entra no sistema do contador como se estivesse certo. A conferência de saldo pega isso antes do download. Não é palpite. É aritmética no servidor.",
+        text: "Um OFX com linha faltando ou valor invertido entra no sistema do contador como se estivesse certo. A conferência de saldo pega isso antes de baixar. Não é palpite. É aritmética no servidor.",
       },
       {
         type: "p",
@@ -209,12 +209,12 @@ export const ARTICLES: Article[] = [
     slug: "imagem-para-ofx",
     title: "Imagem para OFX: foto do extrato vira arquivo",
     description:
-      "Converter imagem em OFX: foto do aplicativo, scan ou caderno manuscrito. A gente lê, soma e confere o saldo.",
+      "Converter imagem em OFX: foto do aplicativo, cópia do papel ou caderno manuscrito. A gente lê, soma e confere o saldo.",
     date: "2026-08-27",
     blocks: [
       {
         type: "p",
-        text: "Nem sempre o extrato chega em PDF. Às vezes é um print do aplicativo, um scan torto ou uma página de caderno. Imagem para OFX é esse caminho: a foto vira lançamento, o lançamento vira arquivo para o contador.",
+        text: "Nem sempre o extrato chega em PDF. Às vezes é uma foto da tela do aplicativo, uma cópia torta ou uma página de caderno. Imagem para OFX é esse caminho: a foto vira lançamento, o lançamento vira arquivo para o contador.",
       },
       {
         type: "h2",
@@ -224,7 +224,7 @@ export const ARTICLES: Article[] = [
         type: "ul",
         items: [
           "Foto da tela do banco: Nubank, Inter, Itaú, Bradesco, Banco do Brasil",
-          "Scan ou foto do extrato impresso",
+          "Cópia ou foto do extrato impresso",
           "Caderno com PIX, aluguel, mercado, mesmo com letra de mão",
         ],
       },

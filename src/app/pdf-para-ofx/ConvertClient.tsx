@@ -73,7 +73,7 @@ export function ConvertClient() {
             Converter extrato
           </h1>
           <p className="mt-3 text-lg text-slate-600">
-            PDF, foto ou scan. Se o saldo nao fechar, voce confirma antes de baixar o OFX.
+            PDF, foto ou cópia. Se o saldo nao fechar, voce confirma antes de baixar o OFX.
           </p>
         </div>
 

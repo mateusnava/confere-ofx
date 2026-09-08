@@ -52,7 +52,7 @@ export function parseContactInput(
     return { ok: false, error: "Nome longo demais" };
   }
   if (!EMAIL_RE.test(email)) {
-    return { ok: false, error: "Email obrigatorio" };
+    return { ok: false, error: "E-mail obrigatorio" };
   }
 
   return { ok: true, data: { name, email, message } };

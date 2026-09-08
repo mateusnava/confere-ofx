@@ -92,7 +92,7 @@ export function LoginForm({
       }}
     >
       <label className="block">
-        <span className="text-sm font-medium text-[#3d5c56]">Email</span>
+        <span className="text-sm font-medium text-[#3d5c56]">E-mail</span>
         <input
           type="email"
           required
@@ -125,7 +125,7 @@ export function LoginForm({
       ) : null}
 
       {devCode ? (
-        <p className="text-sm text-[#0F6B5C]">Codigo (dev): {devCode}</p>
+        <p className="text-sm text-[#0F6B5C]">Codigo de teste: {devCode}</p>
       ) : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
@@ -152,7 +152,7 @@ export function LoginForm({
             setError(null);
           }}
         >
-          Usar outro email
+          Usar outro e-mail
         </button>
       ) : null}
     </form>
