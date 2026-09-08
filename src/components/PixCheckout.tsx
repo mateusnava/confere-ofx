@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CreditPacks } from "@/components/CreditPacks";
 import { showToast } from "@/components/Toaster";
 import { CREDIT_PACKS, formatCredits, type PackKind } from "@/lib/credits";
+import { trackGoogleAdsPurchase } from "@/lib/google-ads";
 
 export function PixCheckoutRefresh() {
   const router = useRouter();
@@ -40,6 +41,10 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
       const credits = data.credits ?? 0;
       if (!toastedPaid.current) {
         toastedPaid.current = true;
+        trackGoogleAdsPurchase({
+          valueCents: CREDIT_PACKS[kind].amountCents,
+          transactionId: paymentId,
+        });
         showToast(
           "Pagamento confirmado",
           `Voce tem ${formatCredits(credits)}. Faca a consulta novamente e use o credito.`,

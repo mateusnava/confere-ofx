@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Caveat, Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 import { Footer } from "@/components/Footer";
+import { GoogleAdsTag } from "@/components/GoogleAdsTag";
 import { Header } from "@/components/Header";
 import { MixpanelProvider } from "@/components/MixpanelProvider";
 import { SiteChrome } from "@/components/SiteChrome";
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </Suspense>
         <Toaster />
         <MixpanelProvider />
+        <GoogleAdsTag />
       </body>
     </html>
   );
