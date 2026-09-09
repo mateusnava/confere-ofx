@@ -15,13 +15,8 @@ export function trackGoogleAdsPurchase(input: {
     return;
   }
 
-  const sendTo = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION;
-  if (!sendTo) {
-    return;
-  }
-
-  window.gtag("event", "conversion", {
-    send_to: sendTo,
+  window.gtag("event", "purchase", {
+    send_to: GOOGLE_ADS_ID,
     value: input.valueCents / 100,
     currency: "BRL",
     transaction_id: input.transactionId,
