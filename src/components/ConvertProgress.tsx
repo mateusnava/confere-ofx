@@ -15,15 +15,17 @@ const STEPS = [
 ] as const;
 
 export function ConvertProgress({ phase }: ConvertProgressProps) {
+  return <ConvertProgressSteps key={phase} phase={phase} />;
+}
+
+function ConvertProgressSteps({ phase }: ConvertProgressProps) {
   const [stepIndex, setStepIndex] = useState(phase === "upload" ? 0 : 1);
 
   useEffect(() => {
     if (phase === "upload") {
-      setStepIndex(0);
       return;
     }
 
-    setStepIndex(1);
     const interval = window.setInterval(() => {
       setStepIndex((current) =>
         current >= STEPS.length - 1 ? current : current + 1,

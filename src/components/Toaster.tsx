@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+import { useIsClient } from "@/lib/use-is-client";
 
 type ToastMessage = {
   id: number;
@@ -9,16 +10,24 @@ type ToastMessage = {
   description?: string;
 };
 
-type ToastListener = (toasts: ToastMessage[]) => void;
+type ToastListener = () => void;
 
 let nextId = 1;
 let toasts: ToastMessage[] = [];
 const listeners = new Set<ToastListener>();
+const EMPTY_TOASTS: ToastMessage[] = [];
 
 function emit() {
   for (const listener of listeners) {
-    listener(toasts);
+    listener();
   }
+}
+
+function subscribe(onStoreChange: ToastListener) {
+  listeners.add(onStoreChange);
+  return () => {
+    listeners.delete(onStoreChange);
+  };
 }
 
 export function showToast(title: string, description?: string) {
@@ -32,19 +41,10 @@ export function showToast(title: string, description?: string) {
 }
 
 export function Toaster() {
-  const [items, setItems] = useState<ToastMessage[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const isClient = useIsClient();
+  const items = useSyncExternalStore(subscribe, () => toasts, () => EMPTY_TOASTS);
 
-  useEffect(() => {
-    setMounted(true);
-    listeners.add(setItems);
-    setItems(toasts);
-    return () => {
-      listeners.delete(setItems);
-    };
-  }, []);
-
-  if (!mounted || items.length === 0) {
+  if (!isClient || items.length === 0) {
     return null;
   }
 

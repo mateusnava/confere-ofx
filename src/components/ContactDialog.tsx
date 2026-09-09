@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useIsClient } from "@/lib/use-is-client";
 
 type ContactDialogProps = {
   userEmail: string | null;
@@ -43,15 +44,11 @@ function ContactModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const isClient = useIsClient();
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) {
+    if (!isClient) {
       return;
     }
     const previous = document.body.style.overflow;
@@ -70,7 +67,7 @@ function ContactModal({
       document.body.style.overflow = previous;
       document.removeEventListener("keydown", onKey);
     };
-  }, [mounted, onClose]);
+  }, [isClient, onClose]);
 
   async function submit() {
     setLoading(true);
@@ -101,7 +98,7 @@ function ContactModal({
     }
   }
 
-  if (!mounted) {
+  if (!isClient) {
     return null;
   }
 

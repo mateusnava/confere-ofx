@@ -62,20 +62,27 @@ export function Preview({
   expiresAt,
 }: PreviewProps) {
   const [acknowledged, setAcknowledged] = useState(false);
-  const [remainingMs, setRemainingMs] = useState(() =>
-    remainingSessionMs(expiresAt),
-  );
+  const [now, setNow] = useState(() => Date.now());
+  const [forcedExpired, setForcedExpired] = useState(false);
+  const [trackedExpiresAt, setTrackedExpiresAt] = useState(expiresAt);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<ExportFormat | null>(null);
+
+  if (trackedExpiresAt !== expiresAt) {
+    setTrackedExpiresAt(expiresAt);
+    setForcedExpired(false);
+  }
+  const remainingMs = forcedExpired ? 0 : remainingSessionMs(expiresAt, now);
   const expired = remainingMs <= 0;
   const canDownloadOfx = !expired && (balance.ok || acknowledged);
 
   useEffect(() => {
-    setRemainingMs(remainingSessionMs(expiresAt));
     const id = window.setInterval(() => {
-      const next = remainingSessionMs(expiresAt);
-      setRemainingMs(next);
-      if (next <= 0) window.clearInterval(id);
+      const nextNow = Date.now();
+      setNow(nextNow);
+      if (remainingSessionMs(expiresAt, nextNow) <= 0) {
+        window.clearInterval(id);
+      }
     }, 1000);
     return () => window.clearInterval(id);
   }, [expiresAt]);
@@ -98,7 +105,7 @@ export function Preview({
           error?: string;
         } | null;
         if (response.status === 404) {
-          setRemainingMs(0);
+          setForcedExpired(true);
         }
         setDownloadError(exportErrorMessage(response.status, body));
         return;
