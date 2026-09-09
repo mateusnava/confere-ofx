@@ -24,6 +24,7 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
   const [status, setStatus] = useState<"pending" | "paid" | "failed" | null>(
     null,
   );
+  const [checking, setChecking] = useState(false);
   const toastedPaid = useRef(false);
 
   async function refreshStatus(paymentId: string) {
@@ -56,7 +57,7 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
   }
 
   useEffect(() => {
-    if (!pix || status === "paid") {
+    if (!pix || status === "paid" || status === "failed") {
       return;
     }
     const timer = window.setInterval(() => {
@@ -64,6 +65,25 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
     }, 2500);
     return () => window.clearInterval(timer);
   }, [pix, status]);
+
+  async function confirmPaid() {
+    if (!pix || checking) {
+      return;
+    }
+    setChecking(true);
+    setError(null);
+    try {
+      await refreshStatus(pix.paymentId);
+    } catch (checkError) {
+      setError(
+        checkError instanceof Error
+          ? checkError.message
+          : "Erro ao consultar Pix",
+      );
+    } finally {
+      setChecking(false);
+    }
+  }
 
   async function buy() {
     setLoading(true);
@@ -117,12 +137,24 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
             />
           ) : null}
           <p className="mt-3 break-all text-xs text-slate-600">{pix.qrCode}</p>
+          {status !== "failed" ? (
+            <div
+              className="mt-4 flex items-center gap-2"
+              role="status"
+              aria-live="polite"
+              aria-busy="true"
+            >
+              <span className="convert-progress-dot h-2 w-2 rounded-full bg-[#0F6B5C]" />
+              <p className="text-sm text-[#0F6B5C]">Conferindo pagamento...</p>
+            </div>
+          ) : null}
           <button
             type="button"
-            className="mt-3 text-sm font-semibold text-[#0F6B5C]"
-            onClick={() => void refreshStatus(pix.paymentId)}
+            className="mt-3 text-sm font-semibold text-[#0F6B5C] disabled:opacity-60"
+            disabled={checking}
+            onClick={() => void confirmPaid()}
           >
-            Ja paguei
+            {checking ? "Conferindo..." : "Já paguei"}
           </button>
         </div>
       ) : null}
