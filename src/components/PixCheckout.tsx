@@ -137,29 +137,32 @@ export function PixCheckout({ onPaid }: { onPaid?: (credits: number) => void }) 
             />
           ) : null}
           <p className="mt-3 break-all text-xs text-slate-600">{pix.qrCode}</p>
-          {status !== "failed" ? (
-            <div
-              className="mt-4 flex items-center gap-2"
-              role="status"
-              aria-live="polite"
-              aria-busy="true"
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-[#f4fbf9] px-3 py-2.5">
+            {status !== "failed" ? (
+              <div
+                className="flex items-center gap-2"
+                role="status"
+                aria-live="polite"
+                aria-busy="true"
+              >
+                <span className="convert-progress-dot h-2.5 w-2.5 rounded-full bg-[#0F6B5C]" />
+                <p className="text-sm font-medium text-[#0F6B5C]">
+                  Conferindo pagamento...
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-red-600">Pix expirou. Gere outro.</p>
+            )}
+            <button
+              type="button"
+              className="text-sm font-semibold text-[#0F6B5C] underline-offset-2 hover:underline disabled:opacity-60"
+              disabled={checking || status === "failed"}
+              onClick={() => void confirmPaid()}
             >
-              <span className="convert-progress-dot h-2 w-2 rounded-full bg-[#0F6B5C]" />
-              <p className="text-sm text-[#0F6B5C]">Conferindo pagamento...</p>
-            </div>
-          ) : null}
-          <button
-            type="button"
-            className="mt-3 text-sm font-semibold text-[#0F6B5C] disabled:opacity-60"
-            disabled={checking}
-            onClick={() => void confirmPaid()}
-          >
-            {checking ? "Conferindo..." : "Já paguei"}
-          </button>
+              {checking ? "Conferindo..." : "Já paguei"}
+            </button>
+          </div>
         </div>
-      ) : null}
-      {status === "failed" ? (
-        <p className="text-sm text-red-600">Pix expirou. Gere outro.</p>
       ) : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </div>
