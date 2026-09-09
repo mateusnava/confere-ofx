@@ -505,34 +505,23 @@
 
 /* ── Carimbo ── */
 .lab-carimbo {
-  --ink: oklch(27% 0.028 165);
-  --paper: oklch(92.4% 0.02 88);
-  --stamp: oklch(42% 0.074 172);
-  --deep: oklch(33% 0.058 172);
-  --cream: oklch(96.5% 0.012 95);
-  --sheet: oklch(98.6% 0.006 90);
+  --ink: #1c2a26;
+  --muted: #3d5c56;
+  --paper: #f4fbf9;
+  --stamp: #0f6b5c;
+  --deep: #0a4d42;
+  flex: 1;
   position: relative;
   isolation: isolate;
   overflow-x: clip;
   color: var(--ink);
   background-color: var(--paper);
-  background-image:
-    radial-gradient(ellipse 58% 42% at 100% 0%, oklch(42% 0.074 172 / 0.26), transparent 70%),
-    radial-gradient(ellipse 40% 28% at 0% 72%, oklch(72% 0.032 78 / 0.4), transparent 74%),
-    radial-gradient(ellipse 22% 16% at 72% 36%, oklch(42% 0.06 172 / 0.12), transparent 72%);
+  background-image: radial-gradient(
+    ellipse 70% 48% at 100% -8%,
+    color-mix(in oklch, var(--stamp) 16%, transparent),
+    transparent 62%
+  );
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-}
-
-.lab-carimbo .lab-grain {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  display: block;
-  opacity: 0.2;
-  mix-blend-mode: multiply;
 }
 
 .lab-carimbo .lab-shell {
@@ -540,11 +529,15 @@
   z-index: 1;
   width: min(1080px, calc(100% - 2rem));
   margin-inline: auto;
-  padding-top: 1.3rem;
+  padding-top: 1.15rem;
 }
 
 .lab-carimbo--site {
-  padding-bottom: 3rem;
+  padding-bottom: 2.4rem;
+}
+
+.lab.lab-carimbo--site {
+  padding-bottom: 2.4rem;
 }
 
 .lab-carimbo header {
@@ -552,10 +545,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  min-height: 3.5rem;
 }
 
 .lab-carimbo header a {
@@ -563,79 +553,94 @@
   text-decoration: none;
 }
 
-.lab-carimbo header > a:first-child {
+.lab-carimbo .lab-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   color: var(--stamp);
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.lab-carimbo .lab-brand-mark {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
 }
 
 .lab-carimbo .landing-nav {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
+  gap: 1.1rem;
+  font-size: 0.92rem;
+  font-weight: 550;
+  color: var(--muted);
+}
+
+.lab-carimbo .landing-nav a:hover {
+  color: var(--stamp);
 }
 
 .lab-carimbo .hero {
-  padding: clamp(2.6rem, 7vw, 4.6rem) 0 1.8rem;
+  padding: clamp(2.8rem, 7vw, 5rem) 0 1.6rem;
 }
 
 .lab-carimbo h1 {
-  max-width: 11ch;
-  font-size: clamp(3rem, 7vw, 5.8rem);
-  line-height: 0.88;
-  letter-spacing: -0.045em;
-  color: var(--deep);
+  max-width: 12ch;
+  font-size: clamp(2.7rem, 7vw, 5.2rem);
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+  color: var(--stamp);
 }
 
 .lab-carimbo .lead {
-  max-width: 46ch;
-  margin-top: 1.1rem;
+  max-width: 44ch;
+  margin-top: 1.05rem;
   font-size: 1.15rem;
-  line-height: 1.45;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
 .lab-carimbo .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.7rem;
-  margin-top: 1.5rem;
+  margin-top: 1.55rem;
 }
 
 .lab-carimbo .lab-cta {
   border-radius: 999px;
   background: var(--stamp);
-  color: var(--cream);
+  color: var(--paper);
+  transition: background 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lab-carimbo .lab-cta:hover {
+  background: var(--deep);
 }
 
 .lab-carimbo .lab-cta-ghost {
   border-radius: 999px;
   background: transparent;
-  color: var(--deep);
-  box-shadow: inset 0 0 0 1.5px color-mix(in oklch, var(--deep) 55%, transparent);
-}
-
-.lab-carimbo .paper-well,
-.lab-carimbo .artigos-home {
-  width: 100vw;
-  margin-inline: calc(50% - 50vw);
-  padding-block: clamp(2.2rem, 5.5vw, 3.6rem);
-  padding-inline: max(1rem, calc(50vw - min(540px, 50vw - 1rem)));
-  background: var(--sheet);
-  color: var(--ink);
-}
-
-.lab-carimbo .demo-kicker {
-  margin: 0 0 0.7rem;
   color: var(--stamp);
-  font-size: 0.75rem;
-  font-weight: 750;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklch, var(--stamp) 32%, transparent);
+}
+
+.lab-carimbo .lab-cta-ghost:hover {
+  background: color-mix(in oklch, var(--stamp) 8%, transparent);
+}
+
+.lab-carimbo .demo {
+  padding: 0 0 clamp(1.6rem, 4vw, 2.4rem);
 }
 
 .lab-carimbo .demo-steps {
   display: grid;
-  gap: 0.85rem;
-  margin: 0 0 1.1rem;
+  gap: 1rem;
+  margin: 0 0 1.4rem;
   padding: 0;
   list-style: none;
 }
@@ -643,52 +648,43 @@
 @media (min-width: 800px) {
   .lab-carimbo .demo-steps {
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 1.2rem;
+    gap: 1.6rem;
   }
 }
 
 .lab-carimbo .demo-steps li {
-  font-size: 0.95rem;
-  line-height: 1.4;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  color: var(--muted);
 }
 
 .lab-carimbo .demo-steps strong {
   display: block;
-  margin-bottom: 0.2rem;
-}
-
-.lab-carimbo .demo-sides {
-  display: none;
-  justify-content: space-between;
-  margin-bottom: 0.55rem;
-  font-size: 0.72rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.62;
-}
-
-@media (min-width: 720px) {
-  .lab-carimbo .demo-sides {
-    display: flex;
-  }
+  margin-bottom: 0.25rem;
+  color: var(--ink);
+  font-size: 0.95rem;
 }
 
 .lab-carimbo .proof {
   display: grid;
-  gap: 1.5rem;
-  padding: clamp(2.6rem, 6vw, 4rem) 0;
+  gap: 1.8rem;
+  padding: clamp(2.4rem, 6vw, 4rem) 0;
+  border-top: 1px solid color-mix(in oklch, var(--stamp) 12%, transparent);
 }
 
 @media (min-width: 800px) {
   .lab-carimbo .proof {
     grid-template-columns: 1.4fr 1fr;
+    gap: 3rem;
+    align-items: start;
   }
 }
 
-.lab-carimbo .proof h2 {
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
+.lab-carimbo .proof h2,
+.lab-carimbo .artigos-home h2 {
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
   letter-spacing: -0.03em;
+  color: var(--ink);
 }
 
 .lab-carimbo .explain {
@@ -697,29 +693,44 @@
   margin: 1.4rem 0 0;
   padding: 0;
   list-style: none;
-  counter-reset: passo;
 }
 
 .lab-carimbo .explain li {
   padding-top: 0.85rem;
-  border-top: 1px solid color-mix(in oklch, var(--ink) 22%, transparent);
+  border-top: 1px solid color-mix(in oklch, var(--stamp) 12%, transparent);
   font-size: 1rem;
-  line-height: 1.45;
+  line-height: 1.5;
+  color: var(--muted);
 }
 
 .lab-carimbo .explain strong {
   display: block;
   margin-bottom: 0.2rem;
+  color: var(--stamp);
   font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.lab-carimbo .prices {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .lab-carimbo .prices li {
   display: flex;
   justify-content: space-between;
-  padding: 0.65rem 0;
-  border-bottom: 1px solid color-mix(in oklch, var(--ink) 22%, transparent);
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid color-mix(in oklch, var(--stamp) 12%, transparent);
+  color: var(--muted);
+}
+
+.lab-carimbo .prices li span:first-child {
+  color: var(--ink);
+  font-weight: 600;
 }
 
 .lab-carimbo .prices a {
@@ -728,9 +739,13 @@
   text-decoration: none;
 }
 
-.lab-carimbo .artigos-home h2 {
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
-  letter-spacing: -0.03em;
+.lab-carimbo .prices a:hover {
+  text-decoration: underline;
+}
+
+.lab-carimbo .artigos-home {
+  padding: clamp(2.2rem, 5vw, 3.4rem) 0 0;
+  border-top: 1px solid color-mix(in oklch, var(--stamp) 12%, transparent);
 }
 
 .lab-carimbo .artigos-home ol {
@@ -743,10 +758,14 @@
 
 .lab-carimbo .artigos-home a {
   display: block;
-  padding: 0.85rem 0;
-  border-top: 1px solid color-mix(in oklch, var(--ink) 22%, transparent);
+  padding: 0.95rem 0;
+  border-top: 1px solid color-mix(in oklch, var(--stamp) 12%, transparent);
   color: inherit;
   text-decoration: none;
+}
+
+.lab-carimbo .artigos-home a:hover strong {
+  color: var(--stamp);
 }
 
 .lab-carimbo .artigos-home strong {
@@ -757,23 +776,23 @@
   display: block;
   margin-top: 0.25rem;
   font-size: 0.92rem;
-  opacity: 0.78;
+  line-height: 1.45;
+  color: var(--muted);
 }
 
 .lab-carimbo .site-footer--landing {
-  margin-top: 1.6rem;
+  margin-top: 2rem;
   padding: 1.2rem 0 0.4rem;
-  border-top: 1px solid color-mix(in oklch, var(--ink) 22%, transparent);
+  border-top: 1px solid color-mix(in oklch, var(--stamp) 12%, transparent);
 }
 
 .lab-carimbo .site-footer-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem 1.3rem;
-  font-size: 0.75rem;
-  font-weight: 750;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  gap: 0.9rem 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 550;
+  color: var(--muted);
 }
 
 .lab-carimbo .site-footer-nav a,
@@ -783,15 +802,13 @@
   border: 0;
   padding: 0;
   font: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
   cursor: pointer;
   text-decoration: none;
 }
 
 .lab-carimbo .site-footer-nav a:hover,
 .lab-carimbo .site-footer-nav button:hover {
-  text-decoration: underline;
+  color: var(--stamp);
 }
 
 @media (prefers-reduced-motion: reduce) {
