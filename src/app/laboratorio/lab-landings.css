@@ -510,8 +510,10 @@
   --stamp: oklch(42% 0.074 172);
   --deep: oklch(33% 0.058 172);
   --cream: oklch(96.5% 0.012 95);
+  --sheet: oklch(98.6% 0.006 90);
   position: relative;
   isolation: isolate;
+  overflow-x: clip;
   color: var(--ink);
   background-color: var(--paper);
   background-image:
@@ -611,10 +613,14 @@
   box-shadow: inset 0 0 0 1.5px color-mix(in oklch, var(--deep) 55%, transparent);
 }
 
-.lab-carimbo .paper-well {
-  padding: 0.35rem 0 0.2rem;
-  background: transparent;
-  color: inherit;
+.lab-carimbo .paper-well,
+.lab-carimbo .artigos-home {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  padding-block: clamp(2.2rem, 5.5vw, 3.6rem);
+  padding-inline: max(1rem, calc(50vw - min(540px, 50vw - 1rem)));
+  background: var(--sheet);
+  color: var(--ink);
 }
 
 .lab-carimbo .demo-kicker {
@@ -671,7 +677,7 @@
 .lab-carimbo .proof {
   display: grid;
   gap: 1.5rem;
-  padding: 2.2rem 0 3rem;
+  padding: clamp(2.6rem, 6vw, 4rem) 0;
 }
 
 @media (min-width: 800px) {
@@ -722,10 +728,6 @@
   text-decoration: none;
 }
 
-.lab-carimbo .artigos-home {
-  padding: 0 0 1rem;
-}
-
 .lab-carimbo .artigos-home h2 {
   font-size: clamp(1.8rem, 3vw, 2.4rem);
   letter-spacing: -0.03em;
@@ -759,7 +761,7 @@
 }
 
 .lab-carimbo .site-footer--landing {
-  margin-top: 2.4rem;
+  margin-top: 1.6rem;
   padding: 1.2rem 0 0.4rem;
   border-top: 1px solid color-mix(in oklch, var(--ink) 22%, transparent);
 }
