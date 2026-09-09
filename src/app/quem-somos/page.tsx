@@ -55,10 +55,10 @@ export default function QuemSomosPage() {
               boleto, caderno de mercearia e o PDF torto do aplicativo. A
               conta e o suporte passam pelo e-mail{" "}
               <a
-                href="mailto:nava.mateus@gmail.com"
+                href="mailto:contato@confereofx.app"
                 className="font-medium text-[#0F6B5C] hover:underline"
               >
-                nava.mateus@gmail.com
+                contato@confereofx.app
               </a>
               .
             </p>

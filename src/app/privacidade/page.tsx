@@ -30,10 +30,10 @@ export default function PrivacidadePage() {
               O Confere OFX é o responsável pelo tratamento. Para exercer seus
               direitos ou tirar dúvida, escreva para{" "}
               <a
-                href="mailto:nava.mateus@gmail.com"
+                href="mailto:contato@confereofx.app"
                 className="font-medium text-[#0F6B5C] hover:underline"
               >
-                nava.mateus@gmail.com
+                contato@confereofx.app
               </a>
               .
             </p>
